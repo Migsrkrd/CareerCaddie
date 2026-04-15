@@ -1,73 +1,65 @@
-# React + TypeScript + Vite
+# Career Caddie
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+[![Deploy to GitHub Pages](https://github.com/Migsrkrd/CareerCaddie/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/Migsrkrd/CareerCaddie/actions/workflows/deploy-pages.yml)
+[![Live Site](https://img.shields.io/badge/live-github%20pages-2ea44f?logo=github)](https://migsrkrd.github.io/CareerCaddie/)
 
-Currently, two official plugins are available:
+<p align="center">
+  <img src="src/assets/career_caddie_logo.png" alt="Career Caddie logo" width="320" />
+</p>
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Career Caddie is a frontend-only job search companion for storing your most-used snippets, saved links, login credentials, and reusable templates in one place.
 
-## React Compiler
+Everything stays in your browser on your device unless you explicitly export or copy it.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Why this project exists
 
-## Expanding the ESLint configuration
+Job hunting usually means dozens of tabs, repeat typing, and scattered notes. Career Caddie helps reduce that friction by giving you one focused workspace for recurring application tasks.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Core features
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- **Quick Copy:** Save reusable outreach lines and copy them with one click.
+- **Saved Links:** Track job posts and company pages with notes and optional icon scraping.
+- **Login Vault:** Keep usernames/emails and passwords together for application portals.
+- **Templates:** Use bracket placeholders (example: `[name]`) and generate filled messages.
+- **Folders:** Organize snippets, links, logins, and templates in nested folder trees.
+- **Settings + backups:** Export/import JSON backups, tune behavior, and inspect local storage usage.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Privacy-first by design
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- No backend required to use the app
+- Data is stored locally in browser storage (IndexedDB + localStorage)
+- Content leaves your device only when you copy text or export a backup file
+
+## Tech stack
+
+- React 19
+- TypeScript
+- Vite
+- React Router
+- IndexedDB (`idb`)
+
+## Local development
+
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Production build
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run build
+npm run preview
 ```
+
+## Deployment
+
+This repository deploys automatically to GitHub Pages when changes are merged/pushed into `main` via `.github/workflows/deploy-pages.yml`.
+
+If needed, set repository Pages source to **GitHub Actions** in repo settings.
+
+## Project preview
+
+<p align="center">
+  <img src="docs/app-screenshot.png" alt="Career Caddie running app screenshot" width="900" />
+</p>
