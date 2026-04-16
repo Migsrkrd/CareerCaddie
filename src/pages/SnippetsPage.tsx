@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import CreateFormDisclosure from '../components/CreateFormDisclosure.tsx'
 import AddFolderModal from '../components/AddFolderModal.tsx'
 import FolderActionsMenu from '../components/FolderActionsMenu.tsx'
 import FolderPathBar from '../components/FolderPathBar.tsx'
@@ -50,8 +51,8 @@ function CreateSnippetForm({
   }
 
   return (
-    <form className="entry-form" onSubmit={handleSubmit}>
-      <h3 className="panel-card-title">Create snippet</h3>
+    <CreateFormDisclosure title="Create snippet">
+      <form className="entry-form entry-form--disclosure" onSubmit={handleSubmit}>
         <input
           type="text"
           placeholder="Snippet title (example: Intro Message)"
@@ -83,7 +84,8 @@ function CreateSnippetForm({
           ))}
         </select>
         <button type="submit">Add Snippet</button>
-    </form>
+      </form>
+    </CreateFormDisclosure>
   )
 }
 

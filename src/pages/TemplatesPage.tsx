@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import CreateFormDisclosure from '../components/CreateFormDisclosure.tsx'
 import AddFolderModal from '../components/AddFolderModal.tsx'
 import CreateTemplateModal from '../components/CreateTemplateModal.tsx'
 import EditTemplateModal from '../components/EditTemplateModal.tsx'
@@ -123,19 +124,20 @@ function TemplatesPage({
 
         <div className="fs-layout">
           <aside className="fs-sidebar">
-            <section className="template-create-trigger-block">
-              <h3 className="section-title">Create template</h3>
-              <p className="folder-context-hint">
-                Open a focused popup editor while keeping this file-system view in place.
-              </p>
-              <button
-                type="button"
-                className="btn btn--primary template-create-trigger-btn"
-                onClick={openCreateTemplate}
-              >
-                + New template
-              </button>
-            </section>
+            <CreateFormDisclosure title="Create template">
+              <div className="create-disclosure-template-body">
+                <p className="folder-context-hint">
+                  Open a focused popup editor while keeping this file-system view in place.
+                </p>
+                <button
+                  type="button"
+                  className="create-disclosure-submit-btn"
+                  onClick={openCreateTemplate}
+                >
+                  + New template
+                </button>
+              </div>
+            </CreateFormDisclosure>
             <FolderTree
               folders={folders}
               items={templates.map((template) => ({

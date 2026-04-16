@@ -205,29 +205,6 @@
   color: #64748b;
 }
 
-.template-create-trigger-block {
-  border: 1px solid #dbe2ea;
-  border-radius: 10px;
-  background: #f8fafc;
-  padding: 0.72rem;
-}
-
-.template-create-trigger-block .section-title {
-  margin-top: 0;
-}
-
-.template-create-trigger-btn {
-  width: 100%;
-  justify-content: center;
-  border-color: #1d4ed8;
-  color: #1d4ed8;
-  background: #eff6ff;
-}
-
-.template-create-trigger-btn:hover {
-  background: #dbeafe;
-}
-
 .fs-layout {
   display: grid;
   grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
@@ -352,6 +329,147 @@
   background: #f8fafc;
   border-radius: 10px;
   padding: 0.72rem;
+}
+
+.create-disclosure {
+  margin: 0 0 1rem;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 4px 12px -2px rgba(15, 23, 42, 0.06);
+}
+
+.create-disclosure-trigger {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 2.85rem;
+  padding: 0.65rem 0.9rem;
+  margin: 0;
+  border: none;
+  background: linear-gradient(180deg, #fcfcfd 0%, #f8fafc 100%);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  transition: background 0.15s ease;
+}
+
+.create-disclosure-trigger:hover {
+  background: #f1f5f9;
+}
+
+.create-disclosure-trigger:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px rgba(59, 130, 246, 0.45);
+}
+
+.create-disclosure-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #0f172a;
+}
+
+.create-disclosure-chevron-wrap {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.create-disclosure-trigger:hover .create-disclosure-chevron-wrap {
+  background: #e2e8f0;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+.create-disclosure-chevron-svg {
+  display: block;
+  transform: rotate(-90deg);
+  transition: transform 0.2s ease;
+}
+
+.create-disclosure-chevron-svg.is-open {
+  transform: rotate(0deg);
+}
+
+/* Inset tray when open: reads as one intentional block, not a second “stripe” */
+.create-disclosure-panel {
+  margin: 0 0.55rem 0.65rem;
+  padding: 0.85rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.entry-form.entry-form--disclosure {
+  margin: 0;
+  padding: 0;
+  gap: 0.65rem;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.entry-form.entry-form--disclosure input,
+.entry-form.entry-form--disclosure textarea,
+.entry-form.entry-form--disclosure select {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.create-disclosure-template-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.create-disclosure-template-body .folder-context-hint {
+  margin: 0;
+  color: #64748b;
+}
+
+/* Same visual weight as .entry-form button — used for template “+ New template” */
+.create-disclosure-submit-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: inherit;
+  font-weight: 600;
+  border: 1px solid #1d4ed8;
+  color: #1d4ed8;
+  background: #eff6ff;
+  padding: 0.45rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    border-color 0.12s ease;
+}
+
+.create-disclosure-submit-btn:hover {
+  background: #dbeafe;
+  border-color: #2563eb;
 }
 
 .panel-card-title {
@@ -2845,6 +2963,84 @@
     border-color: #334155;
   }
 
+  .create-disclosure {
+    background: #111827;
+    border-color: #334155;
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.35),
+      0 6px 16px -4px rgba(0, 0, 0, 0.45);
+  }
+
+  .create-disclosure-trigger {
+    background: linear-gradient(180deg, #1e293b 0%, #111827 100%);
+  }
+
+  .create-disclosure-trigger:hover {
+    background: #1e293b;
+  }
+
+  .create-disclosure-title {
+    color: #f1f5f9;
+  }
+
+  .create-disclosure-chevron-wrap {
+    background: #0f172a;
+    border-color: #334155;
+    color: #94a3b8;
+  }
+
+  .create-disclosure-trigger:hover .create-disclosure-chevron-wrap {
+    background: #1e293b;
+    border-color: #475569;
+    color: #cbd5e1;
+  }
+
+  .create-disclosure-panel {
+    border-color: #334155;
+    background: #0f172a;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+
+  .entry-form.entry-form--disclosure {
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .entry-form.entry-form--disclosure input,
+  .entry-form.entry-form--disclosure textarea,
+  .entry-form.entry-form--disclosure select {
+    background: #020617;
+    color: #f9fafb;
+    border-color: #334155;
+    box-shadow: none;
+  }
+
+  .create-disclosure-template-body .folder-context-hint {
+    color: #94a3b8;
+  }
+
+  .create-disclosure-submit-btn {
+    border-color: #60a5fa;
+    background: #1e3a8a;
+    color: #dbeafe;
+  }
+
+  .create-disclosure-submit-btn:hover {
+    background: #1d4ed8;
+    border-color: #93c5fd;
+  }
+
+  .entry-form.entry-form--disclosure button {
+    border-color: #60a5fa;
+    background: #1e3a8a;
+    color: #dbeafe;
+  }
+
+  .entry-form.entry-form--disclosure button:hover {
+    background: #1d4ed8;
+    border-color: #93c5fd;
+  }
+
   .folder-panel {
     background: #0f172a;
     border-color: #334155;
@@ -3110,21 +3306,6 @@
     background: rgba(127, 29, 29, 0.45);
     border-color: #f87171;
     color: #fef2f2;
-  }
-
-  .template-create-trigger-block {
-    border-color: #334155;
-    background: #0f172a;
-  }
-
-  .template-create-trigger-btn {
-    border-color: #60a5fa;
-    background: #1e3a8a;
-    color: #dbeafe;
-  }
-
-  .template-create-trigger-btn:hover {
-    background: #1d4ed8;
   }
 
   .template-fill-field input {
