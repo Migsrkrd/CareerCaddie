@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import CreateFormDisclosure from '../components/CreateFormDisclosure.tsx'
 import AddFolderModal from '../components/AddFolderModal.tsx'
 import CreateTemplateModal from '../components/CreateTemplateModal.tsx'
 import EditTemplateModal from '../components/EditTemplateModal.tsx'
@@ -118,24 +119,24 @@ function TemplatesPage({
 
       <section className="card fs-page">
         <h2>Templates</h2>
-        <p className="fs-page-subtitle">Create and manage reusable messages for applications.</p>
-        <p>Use <code>[placeholders]</code>, fill the fields, then copy or download as PDF.</p>
+        <p className="fs-page-subtitle">Create and manage reusable messages for applications. Use <code>[placeholders]</code>, fill the fields, then copy or download as PDF.</p>
 
         <div className="fs-layout">
           <aside className="fs-sidebar">
-            <section className="template-create-trigger-block">
-              <h3 className="section-title">Create template</h3>
-              <p className="folder-context-hint">
-                Open a focused popup editor while keeping this file-system view in place.
-              </p>
-              <button
-                type="button"
-                className="btn btn--primary template-create-trigger-btn"
-                onClick={openCreateTemplate}
-              >
-                + New template
-              </button>
-            </section>
+            <CreateFormDisclosure title="Create template">
+              <div className="create-disclosure-template-body">
+                <p className="folder-context-hint">
+                  Open a focused popup editor while keeping this file-system view in place.
+                </p>
+                <button
+                  type="button"
+                  className="create-disclosure-submit-btn"
+                  onClick={openCreateTemplate}
+                >
+                  + New template
+                </button>
+              </div>
+            </CreateFormDisclosure>
             <FolderTree
               folders={folders}
               items={templates.map((template) => ({
@@ -182,7 +183,6 @@ function TemplatesPage({
                 </button>
               </div>
             </div>
-            <h3 className="section-title">Template folders</h3>
             {pathValid && (
               <ul className="folder-list">
                 {visibleFolders.map((folder) => (
@@ -269,16 +269,7 @@ function TemplatesPage({
               <p className="list-empty">This folder was not found.</p>
             )}
             {pathValid && !filteredTemplates.length && !visibleFolders.length && (
-              <div className="template-empty-state">
-                <p className="list-empty">No templates in this location.</p>
-                <button
-                  type="button"
-                  className="btn btn--primary btn--compact"
-                  onClick={openCreateTemplate}
-                >
-                  Create your first template
-                </button>
-              </div>
+              <p className="list-empty">No templates in this location.</p>
             )}
           </section>
         </div>

@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import CreateFormDisclosure from '../components/CreateFormDisclosure.tsx'
 import AddFolderModal from '../components/AddFolderModal.tsx'
 import FolderActionsMenu from '../components/FolderActionsMenu.tsx'
 import FolderPathBar from '../components/FolderPathBar.tsx'
@@ -63,8 +64,8 @@ function CreateLoginForm({
   }
 
   return (
-    <form className="entry-form" onSubmit={handleSubmit}>
-      <h3 className="panel-card-title">Create login entry</h3>
+    <CreateFormDisclosure title="Create login entry">
+      <form className="entry-form entry-form--disclosure" onSubmit={handleSubmit}>
         <input
           type="text"
           placeholder="Website name"
@@ -106,7 +107,8 @@ function CreateLoginForm({
           ))}
         </select>
         <button type="submit">Save Login</button>
-    </form>
+      </form>
+    </CreateFormDisclosure>
   )
 }
 

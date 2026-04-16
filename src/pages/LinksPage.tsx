@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import CreateFormDisclosure from '../components/CreateFormDisclosure.tsx'
 import AddFolderModal from '../components/AddFolderModal.tsx'
 import FolderActionsMenu from '../components/FolderActionsMenu.tsx'
 import FolderPathBar from '../components/FolderPathBar.tsx'
@@ -64,8 +65,8 @@ function CreateLinkForm({
   }
 
   return (
-    <form className="entry-form" onSubmit={handleSubmit}>
-      <h3 className="panel-card-title">Create link</h3>
+    <CreateFormDisclosure title="Create link">
+      <form className="entry-form entry-form--disclosure" onSubmit={handleSubmit}>
         <input
           type="text"
           placeholder="Link label (example: Stripe Backend Role)"
@@ -101,7 +102,8 @@ function CreateLinkForm({
         <button type="submit" disabled={isScrapingIcon}>
           {isScrapingIcon ? 'Scraping Icon...' : 'Save Link'}
         </button>
-    </form>
+      </form>
+    </CreateFormDisclosure>
   )
 }
 

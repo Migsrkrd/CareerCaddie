@@ -63,7 +63,8 @@ function EditTemplateModal({ template, onClose, onSave }: EditTemplateModalProps
           <p className="template-field-hint">
             Use square brackets for fill-in fields, for example{' '}
             <code>[name]</code> or <code>[company]</code>. Each unique name gets its own box
-            when you use the template.
+            when you use the template. Names like <code>[interview date]</code>, <code>[email]</code>, or{' '}
+            <code>[phone]</code> get quick suggestions and pickers when you use the template.
           </p>
           <textarea
             className="template-body-textarea"

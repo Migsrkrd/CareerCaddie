@@ -98,7 +98,8 @@ function CreateTemplateModal({
           </div>
           <p className="template-field-hint template-field-hint--compact">
             Use <code>[field name]</code> for fill-in spots, for example <code>[name]</code> or{' '}
-            <code>[company]</code>.
+            <code>[company]</code>. Names like <code>[interview date]</code>, <code>[email]</code>, or{' '}
+            <code>[phone]</code> get quick suggestions and pickers when you use the template.
           </p>
           <textarea
             className="template-body-textarea"

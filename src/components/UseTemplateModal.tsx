@@ -5,6 +5,7 @@ import {
   extractPlaceholderKeys,
   hasBracketPlaceholders,
 } from '../templateUtils.ts'
+import TemplatePlaceholderInput from './TemplatePlaceholderInput.tsx'
 
 type UseTemplateModalProps = {
   template: TemplateEntry
@@ -92,21 +93,17 @@ function UseTemplateModal({
             {keys.length > 0 ? (
               <div className="template-fill-fields">
                 {keys.map((key) => (
-                  <label key={key} className="template-fill-field">
-                    <span className="template-fill-label">{key}</span>
-                    <input
-                      type="text"
-                      value={values[key] ?? ''}
-                      placeholder={`[${key}]`}
-                      autoComplete="off"
-                      onChange={(event) =>
-                        setValues((current) => ({
-                          ...current,
-                          [key]: event.target.value,
-                        }))
-                      }
-                    />
-                  </label>
+                  <TemplatePlaceholderInput
+                    key={key}
+                    fieldKey={key}
+                    value={values[key] ?? ''}
+                    onChange={(next) =>
+                      setValues((current) => ({
+                        ...current,
+                        [key]: next,
+                      }))
+                    }
+                  />
                 ))}
               </div>
             ) : (
