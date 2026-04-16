@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import CopyFeedbackButton from './CopyFeedbackButton.tsx'
 import { useAnimatedModalClose } from '../hooks/useAnimatedModalClose.ts'
 import type { TemplateEntry } from '../types'
 import {
@@ -11,7 +12,7 @@ import TemplatePlaceholderInput from './TemplatePlaceholderInput.tsx'
 type UseTemplateModalProps = {
   template: TemplateEntry
   onClose: () => void
-  onCopyFilled: (text: string, successLabel: string) => void
+  onCopyFilled: (text: string, successLabel: string) => Promise<boolean>
   onStatusMessage?: (message: string) => void
 }
 
@@ -46,10 +47,6 @@ function UseTemplateModal({
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
   }, [requestClose])
-
-  const handleCopy = () => {
-    onCopyFilled(preview, template.label)
-  }
 
   const handleDownloadPdf = async () => {
     if (hasBracketPlaceholders(preview)) {
@@ -132,9 +129,12 @@ function UseTemplateModal({
             <button type="button" className="btn btn--secondary" onClick={handleDownloadPdf}>
               Download PDF
             </button>
-            <button type="button" className="btn btn--primary" onClick={handleCopy}>
+            <CopyFeedbackButton
+              className="btn btn--primary"
+              onCopy={() => onCopyFilled(preview, template.label)}
+            >
               Copy text
-            </button>
+            </CopyFeedbackButton>
           </div>
         </div>
       </div>

@@ -35,7 +35,7 @@ type TemplatesPageProps = {
   onDeleteTemplate: (id: string) => void
   onMoveTemplate: (id: string, folderId: string | null) => void
   onUpdateTemplate: (id: string, label: string, content: string) => void
-  onCopyFilledTemplate: (text: string, successLabel: string) => void
+  onCopyFilledTemplate: (text: string, successLabel: string) => Promise<boolean>
   onTemplateStatusMessage?: (message: string) => void
 }
 
@@ -219,6 +219,7 @@ function TemplatesPage({
                 </button>
               </div>
             </div>
+            <h3 className="section-title">Saved Templates</h3>
             {pathValid && (
               <ul className="folder-list">
                 {visibleFolders.map((folder) => (
@@ -253,7 +254,6 @@ function TemplatesPage({
                 ))}
               </ul>
             )}
-            <h3 className="section-title">Saved templates</h3>
             <ul className="item-list">
               {filteredTemplates.map((template) => (
                 <li

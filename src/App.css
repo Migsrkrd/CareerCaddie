@@ -465,8 +465,9 @@
 }
 
 .fs-page-subtitle {
-  margin: 0 0 0.2rem;
+  margin: 0 0 0.75rem;
   font-size: 0.92rem;
+  line-height: 1.45;
   color: #64748b;
 }
 
@@ -1149,7 +1150,6 @@
 }
 
 .entry-form button,
-.actions > button,
 .settings-actions button {
   width: fit-content;
   font: inherit;
@@ -1162,9 +1162,146 @@
 }
 
 .entry-form button:hover,
-.actions > button:hover,
 .settings-actions button:hover {
   background: #dbeafe;
+}
+
+/* Row actions: muted copy vs solid “Go” (plain button, not .btn — templates keep btn--primary) */
+.actions > .copy-feedback-btn {
+  box-sizing: border-box;
+  width: fit-content;
+  min-height: var(--action-control-height);
+  height: var(--action-control-height);
+  font: inherit;
+  font-weight: 500;
+  font-size: 0.92rem;
+  line-height: 1.25;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  background: #ffffff;
+  padding: 0 0.7rem;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.85) inset;
+}
+
+.actions > .copy-feedback-btn:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+.actions > .copy-feedback-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px rgba(148, 163, 184, 0.55);
+}
+
+.actions > button:not(.copy-feedback-btn):not(.btn) {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-height: var(--action-control-height);
+  height: var(--action-control-height);
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.92rem;
+  line-height: 1.25;
+  border: 1px solid #1d4ed8;
+  color: #fff;
+  background: #2563eb;
+  padding: 0 0.78rem;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(37, 99, 235, 0.22);
+}
+
+.actions > button:not(.copy-feedback-btn):not(.btn):hover {
+  background: #1d4ed8;
+  border-color: #1e40af;
+}
+
+.actions > button:not(.copy-feedback-btn):not(.btn):focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px rgba(59, 130, 246, 0.45);
+}
+
+.copy-feedback-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+/* Label + check share one grid cell so width stays max(label, ✓) — no jump */
+.copy-feedback-btn-stack {
+  display: inline-grid;
+  grid-template-columns: minmax(0, max-content);
+  grid-template-rows: 1fr;
+  place-items: center;
+  vertical-align: middle;
+}
+
+.copy-feedback-btn-face {
+  grid-area: 1 / 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.copy-feedback-btn-face--hidden {
+  visibility: hidden;
+}
+
+.copy-feedback-btn-check {
+  font-size: 1.1rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.copy-feedback-btn.copy-feedback-btn--copied {
+  pointer-events: none;
+  background: #16a34a;
+  border-color: #15803d;
+  color: #f9fafb;
+}
+
+.copy-feedback-btn.copy-feedback-btn--copied:hover {
+  background: #15803d;
+  border-color: #166534;
+  color: #f9fafb;
+}
+
+.actions > .copy-feedback-btn.copy-feedback-btn--copied,
+.entry-form .copy-feedback-btn.copy-feedback-btn--copied {
+  background: #16a34a;
+  border-color: #15803d;
+  color: #f9fafb;
+}
+
+.actions > .copy-feedback-btn.copy-feedback-btn--copied:hover,
+.entry-form .copy-feedback-btn.copy-feedback-btn--copied:hover {
+  background: #15803d;
+  border-color: #166534;
+}
+
+.btn.copy-feedback-btn.copy-feedback-btn--copied,
+.contact-action-btn.copy-feedback-btn.copy-feedback-btn--copied {
+  background: #16a34a;
+  border-color: #15803d;
+  color: #f9fafb;
+}
+
+.btn.copy-feedback-btn.copy-feedback-btn--copied:hover,
+.contact-action-btn.copy-feedback-btn.copy-feedback-btn--copied:hover {
+  background: #15803d;
+  border-color: #166534;
+  color: #f9fafb;
 }
 
 .item-list {
@@ -1337,10 +1474,11 @@
 }
 
 .actions {
+  --action-control-height: 2rem;
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  gap: 0.45rem;
+  gap: 0.38rem;
   justify-content: flex-end;
   align-items: center;
   flex-shrink: 0;
@@ -1432,6 +1570,19 @@
   background: #1d4ed8;
 }
 
+.actions > .btn {
+  box-sizing: border-box;
+  min-height: var(--action-control-height);
+  height: var(--action-control-height);
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.actions > .btn.btn--compact {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
 .item-overflow {
   position: relative;
   flex-shrink: 0;
@@ -1451,6 +1602,13 @@
   font-size: 1.15rem;
   line-height: 1;
   cursor: pointer;
+}
+
+.actions .item-overflow-trigger {
+  width: var(--action-control-height);
+  min-width: var(--action-control-height);
+  height: var(--action-control-height);
+  min-height: var(--action-control-height);
 }
 
 .item-overflow-trigger:hover {
@@ -1781,6 +1939,61 @@
 
 .folder-add-form {
   margin-bottom: 0;
+}
+
+.folder-add-actions {
+  gap: 0.38rem;
+}
+
+.folder-add-actions .btn {
+  box-sizing: border-box;
+  min-height: 2rem;
+  height: 2rem;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.folder-add-actions .btn.btn--compact {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
+/* Match list-row action colors: muted secondary (Copy) + solid primary (Go) */
+.folder-add-actions .btn--ghost.btn--compact {
+  font-weight: 500;
+  background: #ffffff;
+  color: #64748b;
+  border-color: #e2e8f0;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.85) inset;
+}
+
+.folder-add-actions .btn--ghost.btn--compact:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+.folder-add-actions .btn--ghost.btn--compact:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px rgba(148, 163, 184, 0.55);
+}
+
+.folder-add-actions .btn--primary.btn--compact {
+  font-weight: 600;
+  color: #fff;
+  background: #2563eb;
+  border-color: #1d4ed8;
+  box-shadow: 0 1px 2px rgba(37, 99, 235, 0.22);
+}
+
+.folder-add-actions .btn--primary.btn--compact:hover {
+  background: #1d4ed8;
+  border-color: #1e40af;
+}
+
+.folder-add-actions .btn--primary.btn--compact:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px rgba(59, 130, 246, 0.45);
 }
 
 .item-edit-title {
@@ -4192,6 +4405,70 @@
   .item {
     border-color: #374151;
     background: #0b1220;
+  }
+
+  .actions > .copy-feedback-btn {
+    background: #111827;
+    border-color: #334155;
+    color: #94a3b8;
+    box-shadow: none;
+  }
+
+  .actions > .copy-feedback-btn:hover {
+    background: #1e293b;
+    border-color: #475569;
+    color: #e2e8f0;
+  }
+
+  .actions > .copy-feedback-btn:focus-visible {
+    box-shadow: 0 0 0 2px #0b1220, 0 0 0 4px rgba(148, 163, 184, 0.45);
+  }
+
+  .actions > button:not(.copy-feedback-btn):not(.btn) {
+    background: #2563eb;
+    border-color: #1d4ed8;
+    color: #fff;
+  }
+
+  .actions > button:not(.copy-feedback-btn):not(.btn):hover {
+    background: #1d4ed8;
+    border-color: #1e40af;
+  }
+
+  .actions > button:not(.copy-feedback-btn):not(.btn):focus-visible {
+    box-shadow: 0 0 0 2px #0b1220, 0 0 0 4px rgba(59, 130, 246, 0.5);
+  }
+
+  .folder-add-actions .btn--ghost.btn--compact {
+    background: #111827;
+    border-color: #334155;
+    color: #94a3b8;
+    box-shadow: none;
+  }
+
+  .folder-add-actions .btn--ghost.btn--compact:hover {
+    background: #1e293b;
+    border-color: #475569;
+    color: #e2e8f0;
+  }
+
+  .folder-add-actions .btn--ghost.btn--compact:focus-visible {
+    box-shadow: 0 0 0 2px #111827, 0 0 0 4px rgba(148, 163, 184, 0.45);
+  }
+
+  .folder-add-actions .btn--primary.btn--compact {
+    background: #2563eb;
+    border-color: #1d4ed8;
+    color: #fff;
+  }
+
+  .folder-add-actions .btn--primary.btn--compact:hover {
+    background: #1d4ed8;
+    border-color: #1e40af;
+  }
+
+  .folder-add-actions .btn--primary.btn--compact:focus-visible {
+    box-shadow: 0 0 0 2px #111827, 0 0 0 4px rgba(59, 130, 246, 0.5);
   }
 
   .link-icon-fallback {

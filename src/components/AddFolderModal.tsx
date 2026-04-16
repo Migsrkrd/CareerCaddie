@@ -80,11 +80,13 @@ function AddFolderModal({ parentLabel, onClose, onSave }: AddFolderModalProps) {
               {error}
             </p>
           ) : null}
-          <div className="item-edit-actions">
-            <button type="button" className="item-edit-cancel" onClick={requestClose}>
+          <div className="item-edit-actions folder-add-actions">
+            <button type="button" className="btn btn--ghost btn--compact" onClick={requestClose}>
               Cancel
             </button>
-            <button type="submit">Create folder</button>
+            <button type="submit" className="btn btn--primary btn--compact">
+              Create folder
+            </button>
           </div>
         </form>
       </div>

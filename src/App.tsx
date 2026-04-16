@@ -373,15 +373,17 @@ function App() {
     settings,
   ])
 
-  const copyToClipboard = async (content: string, successLabel: string) => {
+  const copyToClipboard = async (content: string, successLabel: string): Promise<boolean> => {
     try {
       await navigator.clipboard.writeText(content)
       setCopyStatus(`${successLabel} copied!`)
       setTimeout(() => {
         setCopyStatus('')
       }, 1800)
+      return true
     } catch {
       setCopyStatus('Clipboard access failed. Please try again.')
+      return false
     }
   }
 

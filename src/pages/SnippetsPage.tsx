@@ -6,6 +6,7 @@ import { useRecentlyChangedIds } from '../hooks/useRecentlyChangedIds.ts'
 import { useScrollToItemHash } from '../hooks/useScrollToItemHash.ts'
 import { useRecentlyAddedIds } from '../hooks/useRecentlyAddedIds.ts'
 import { workspaceItemElementId } from '../workspaceItemIds.ts'
+import CopyFeedbackButton from '../components/CopyFeedbackButton.tsx'
 import AddFolderModal from '../components/AddFolderModal.tsx'
 import FolderActionsMenu from '../components/FolderActionsMenu.tsx'
 import FolderPathBar from '../components/FolderPathBar.tsx'
@@ -104,7 +105,7 @@ type SnippetsPageProps = {
   onDeleteFolder: (id: string) => void
   onAddSnippet: (label: string, content: string, folderId: string | null) => void
   onDeleteSnippet: (id: string) => void
-  onCopySnippet: (snippet: CopySnippet) => void
+  onCopySnippet: (snippet: CopySnippet) => Promise<boolean>
   onMoveSnippet: (id: string, folderId: string | null) => void
   onUpdateSnippet: (id: string, label: string, content: string) => void
 }
@@ -192,7 +193,7 @@ function SnippetsPage({
       className={`card fs-page workspace-page workspace-page--snippets${animateOnEntry ? ' workspace-page--entry' : ''}`}
     >
       <h2>Quick Copy Buttons</h2>
-      <p>Save reusable snippets and copy them with one click.</p>
+      <p className="fs-page-subtitle">Save reusable snippets and copy them with one click.</p>
       <div className="fs-layout">
         <aside className="fs-sidebar">
           <CreateSnippetForm
@@ -303,9 +304,9 @@ function SnippetsPage({
                   <p>{snippet.content}</p>
                 </div>
                 <div className="actions">
-                  <button type="button" onClick={() => onCopySnippet(snippet)}>
+                  <CopyFeedbackButton onCopy={() => onCopySnippet(snippet)}>
                     Copy
-                  </button>
+                  </CopyFeedbackButton>
                   <ItemOverflowMenu ariaLabel={`More actions for ${snippet.label}`}>
                     {(close) => (
                       <div className="overflow-menu-stack">

@@ -6,6 +6,7 @@ import { useRecentlyChangedIds } from '../hooks/useRecentlyChangedIds.ts'
 import { useScrollToItemHash } from '../hooks/useScrollToItemHash.ts'
 import { useRecentlyAddedIds } from '../hooks/useRecentlyAddedIds.ts'
 import { workspaceItemElementId } from '../workspaceItemIds.ts'
+import CopyFeedbackButton from '../components/CopyFeedbackButton.tsx'
 import AddFolderModal from '../components/AddFolderModal.tsx'
 import FolderActionsMenu from '../components/FolderActionsMenu.tsx'
 import FolderPathBar from '../components/FolderPathBar.tsx'
@@ -128,7 +129,7 @@ type LinksPageProps = {
     folderId: string | null,
   ) => void
   onDeleteLink: (id: string) => void
-  onCopyLink: (link: SavedLink) => void
+  onCopyLink: (link: SavedLink) => Promise<boolean>
   onMoveLink: (id: string, folderId: string | null) => void
   onUpdateLink: (
     id: string,
@@ -221,7 +222,9 @@ function LinksPage({
       className={`card fs-page workspace-page workspace-page--links${animateOnEntry ? ' workspace-page--entry' : ''}`}
     >
       <h2>Saved Job Links</h2>
-      <p>Keep job postings, applications, and portal links in one place.</p>
+      <p className="fs-page-subtitle">
+        Keep job postings, applications, and portal links in one place.
+      </p>
       <div className="fs-layout">
         <aside className="fs-sidebar">
           <CreateLinkForm
@@ -349,9 +352,9 @@ function LinksPage({
                   {link.notes && <p>{link.notes}</p>}
                 </div>
                 <div className="actions">
-                  <button type="button" onClick={() => onCopyLink(link)}>
+                  <CopyFeedbackButton onCopy={() => onCopyLink(link)}>
                     Copy Link
-                  </button>
+                  </CopyFeedbackButton>
                   <button
                     type="button"
                     onClick={() =>

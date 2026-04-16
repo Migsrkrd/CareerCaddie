@@ -6,6 +6,7 @@ import { useRecentlyChangedIds } from '../hooks/useRecentlyChangedIds.ts'
 import { useScrollToItemHash } from '../hooks/useScrollToItemHash.ts'
 import { useRecentlyAddedIds } from '../hooks/useRecentlyAddedIds.ts'
 import { workspaceItemElementId } from '../workspaceItemIds.ts'
+import CopyFeedbackButton from '../components/CopyFeedbackButton.tsx'
 import AddFolderModal from '../components/AddFolderModal.tsx'
 import FolderActionsMenu from '../components/FolderActionsMenu.tsx'
 import FolderPathBar from '../components/FolderPathBar.tsx'
@@ -134,8 +135,8 @@ type LoginsPageProps = {
     folderId: string | null,
   ) => void
   onDeleteLogin: (id: string) => void
-  onCopyUsername: (login: LoginEntry) => void
-  onCopyPassword: (login: LoginEntry) => void
+  onCopyUsername: (login: LoginEntry) => Promise<boolean>
+  onCopyPassword: (login: LoginEntry) => Promise<boolean>
   onMoveLogin: (id: string, folderId: string | null) => void
   onUpdateLogin: (
     id: string,
@@ -234,9 +235,8 @@ function LoginsPage({
       className={`card fs-page workspace-page workspace-page--logins${animateOnEntry ? ' workspace-page--entry' : ''}`}
     >
       <h2>Saved Login Info</h2>
-      <p>
-        Keep website login details for your job hunt tools. Data stays only on your
-        device.
+      <p className="fs-page-subtitle">
+        Keep website login details for your job hunt tools. Data stays only on your device.
       </p>
       <div className="fs-layout">
         <aside className="fs-sidebar">
@@ -363,12 +363,12 @@ function LoginsPage({
                     {login.notes && <p>{login.notes}</p>}
                   </div>
                   <div className="actions">
-                    <button type="button" onClick={() => onCopyUsername(login)}>
+                    <CopyFeedbackButton onCopy={() => onCopyUsername(login)}>
                       Copy {copyLabel}
-                    </button>
-                    <button type="button" onClick={() => onCopyPassword(login)}>
+                    </CopyFeedbackButton>
+                    <CopyFeedbackButton onCopy={() => onCopyPassword(login)}>
                       Copy Password
-                    </button>
+                    </CopyFeedbackButton>
                     <ItemOverflowMenu ariaLabel={`More actions for ${login.site}`}>
                       {(close) => (
                         <div className="overflow-menu-stack">
