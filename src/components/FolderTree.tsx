@@ -73,7 +73,10 @@ function FolderTree({
         {children.map((folder) => {
           const nextTrail = [...trail, folder.name]
           const isActive = activeFolderId === folder.id
-          const hasChildren = (childrenByParent.get(folder.id) ?? []).length > 0
+          const hasChildFolders = (childrenByParent.get(folder.id) ?? []).length > 0
+          const hasItemsInFolder = items.some((item) => item.folderId === folder.id)
+          /** Show a toggle whenever this folder has subfolders and/or entries nested under it. */
+          const hasChildren = hasChildFolders || hasItemsInFolder
           const isExpanded = autoExpandedIds.has(folder.id)
             ? !collapsedAutoIds.has(folder.id)
             : expandedIds.has(folder.id)
@@ -180,7 +183,7 @@ function FolderTree({
   return (
     <section className="folder-tree-panel">
       <div className="folder-tree-header">
-        <h3>Folders</h3>
+        <h3>Directory tree</h3>
         <button
           type="button"
           className={activeFolderId === null ? 'folder-tree-root active' : 'folder-tree-root'}
