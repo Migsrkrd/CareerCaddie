@@ -3,6 +3,8 @@ import { Navigate, NavLink, Route, Routes } from 'react-router-dom'
 import './App.css'
 import { getStoredValue, setStoredValue } from './indexedDb.ts'
 import AboutPage from './pages/AboutPage.tsx'
+import HomeLandingRoute from './components/HomeLandingRoute.tsx'
+import HomePage from './pages/HomePage.tsx'
 import LoginsPage from './pages/LoginsPage.tsx'
 import LinksPage from './pages/LinksPage.tsx'
 import SettingsPage from './pages/SettingsPage.tsx'
@@ -504,12 +506,18 @@ function App() {
   const workspaceTabClass = ({ isActive }: { isActive: boolean }) =>
     isActive ? 'app-workspace-tab active' : 'app-workspace-tab'
 
+  const hasWorkspaceData =
+    snippets.length > 0 ||
+    links.length > 0 ||
+    logins.length > 0 ||
+    templates.length > 0
+
   return (
     <div className="app-shell">
       <header className="hero">
         <div className="app-navbar">
           <div className="app-navbar-brand">
-            <NavLink to="/snippets" className="app-brand-link" title="Home">
+            <NavLink to="/" end className="app-brand-link" title="Home">
               <h1 className="app-brand-heading">
                 <img
                   src={careerCaddieLogo}
@@ -521,6 +529,9 @@ function App() {
             </NavLink>
           </div>
           <nav className="app-navbar-links" aria-label="Site">
+            <NavLink to="/guide" className={navbarLinkClass}>
+              Guide
+            </NavLink>
             <NavLink to="/about" className={navbarLinkClass}>
               About
             </NavLink>
@@ -559,6 +570,16 @@ function App() {
 
       <main className="app-main">
         <Routes>
+        <Route
+          path="/"
+          element={
+            <HomeLandingRoute
+              isDataHydrated={isDataHydrated}
+              hasWorkspaceData={hasWorkspaceData}
+            />
+          }
+        />
+        <Route path="/guide" element={<HomePage />} />
         <Route
           path="/snippets/*"
           element={
@@ -851,7 +872,7 @@ function App() {
             />
           }
         />
-        <Route path="*" element={<Navigate to="/snippets" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
 
@@ -876,6 +897,7 @@ function App() {
           <div className="app-footer-col">
             <span className="app-footer-heading">Help &amp; app</span>
             <nav className="app-footer-nav" aria-label="Footer help">
+              <NavLink to="/guide">Guide</NavLink>
               <NavLink to="/about">About</NavLink>
               <NavLink to="/support">Support</NavLink>
               <NavLink to="/tools">Tools</NavLink>
