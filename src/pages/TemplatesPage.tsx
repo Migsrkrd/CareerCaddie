@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import CreateFormDisclosure from '../components/CreateFormDisclosure.tsx'
+import { useScrollToItemHash } from '../hooks/useScrollToItemHash.ts'
+import { workspaceItemElementId } from '../workspaceItemIds.ts'
 import AddFolderModal from '../components/AddFolderModal.tsx'
 import CreateTemplateModal from '../components/CreateTemplateModal.tsx'
 import EditTemplateModal from '../components/EditTemplateModal.tsx'
@@ -80,6 +82,10 @@ function TemplatesPage({
   })
 
   const visibleFolders = pathValid ? getChildFolders(folders, activeFolderId) : []
+
+  useScrollToItemHash(
+    `${pathRest}|${filteredTemplates.map((t) => t.id).join(',')}`,
+  )
 
   return (
     <>
@@ -210,7 +216,11 @@ function TemplatesPage({
             <h3 className="section-title">Saved templates</h3>
             <ul className="item-list">
               {filteredTemplates.map((template) => (
-                <li key={template.id} className="item">
+                <li
+                  key={template.id}
+                  id={workspaceItemElementId(template.id)}
+                  className="item"
+                >
                   <div>
                     <h3>{template.label}</h3>
                     <p className="template-list-preview">{template.content}</p>

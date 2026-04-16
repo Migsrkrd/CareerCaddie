@@ -1,6 +1,8 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import CreateFormDisclosure from '../components/CreateFormDisclosure.tsx'
+import { useScrollToItemHash } from '../hooks/useScrollToItemHash.ts'
+import { workspaceItemElementId } from '../workspaceItemIds.ts'
 import AddFolderModal from '../components/AddFolderModal.tsx'
 import FolderActionsMenu from '../components/FolderActionsMenu.tsx'
 import FolderPathBar from '../components/FolderPathBar.tsx'
@@ -172,6 +174,8 @@ function LinksPage({
 
   const visibleFolders = pathValid ? getChildFolders(folders, activeFolderId) : []
 
+  useScrollToItemHash(`${pathRest}|${filteredLinks.map((l) => l.id).join(',')}`)
+
   return (
     <>
     {editingLink ? (
@@ -276,7 +280,7 @@ function LinksPage({
           )}
           <ul className="item-list">
             {filteredLinks.map((link) => (
-              <li key={link.id} className="item">
+              <li key={link.id} id={workspaceItemElementId(link.id)} className="item">
                 <div>
                   <h3 className="item-title">
                     {link.iconUrl && !brokenIcons[link.id] ? (

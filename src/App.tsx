@@ -3,6 +3,7 @@ import { Navigate, NavLink, Route, Routes } from 'react-router-dom'
 import './App.css'
 import { getStoredValue, setStoredValue } from './indexedDb.ts'
 import AboutPage from './pages/AboutPage.tsx'
+import GlobalSearch from './components/GlobalSearch.tsx'
 import HomeLandingRoute from './components/HomeLandingRoute.tsx'
 import HomePage from './pages/HomePage.tsx'
 import LoginsPage from './pages/LoginsPage.tsx'
@@ -551,20 +552,33 @@ function App() {
           copy, bookmarked links, and login details actually live. They stay on this device,
           not on someone else's servers.
         </p>
-        <nav className="app-workspace-nav" aria-label="Workspace">
-          <NavLink to="/snippets" className={workspaceTabClass}>
-            Quick Copy
-          </NavLink>
-          <NavLink to="/links" className={workspaceTabClass}>
-            Saved Links
-          </NavLink>
-          <NavLink to="/logins" className={workspaceTabClass}>
-            Login Vault
-          </NavLink>
-          <NavLink to="/templates" className={workspaceTabClass}>
-            Templates
-          </NavLink>
-        </nav>
+        <div className="app-workspace-nav-row">
+          <nav className="app-workspace-nav" aria-label="Workspace">
+            <NavLink to="/snippets" className={workspaceTabClass}>
+              Quick Copy
+            </NavLink>
+            <NavLink to="/links" className={workspaceTabClass}>
+              Saved Links
+            </NavLink>
+            <NavLink to="/logins" className={workspaceTabClass}>
+              Login Vault
+            </NavLink>
+            <NavLink to="/templates" className={workspaceTabClass}>
+              Templates
+            </NavLink>
+          </nav>
+          <GlobalSearch
+            isDataHydrated={isDataHydrated}
+            snippets={snippets}
+            snippetFolders={snippetFolders}
+            links={links}
+            linkFolders={linkFolders}
+            logins={logins}
+            loginFolders={loginFolders}
+            templates={templates}
+            templateFolders={templateFolders}
+          />
+        </div>
         <p className="status">{copyStatus || 'Clipboard actions ready.'}</p>
       </header>
 

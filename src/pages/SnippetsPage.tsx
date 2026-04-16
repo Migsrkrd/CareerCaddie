@@ -1,6 +1,8 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import CreateFormDisclosure from '../components/CreateFormDisclosure.tsx'
+import { useScrollToItemHash } from '../hooks/useScrollToItemHash.ts'
+import { workspaceItemElementId } from '../workspaceItemIds.ts'
 import AddFolderModal from '../components/AddFolderModal.tsx'
 import FolderActionsMenu from '../components/FolderActionsMenu.tsx'
 import FolderPathBar from '../components/FolderPathBar.tsx'
@@ -142,6 +144,10 @@ function SnippetsPage({
 
   const visibleFolders = pathValid ? getChildFolders(folders, activeFolderId) : []
 
+  useScrollToItemHash(
+    `${pathRest}|${filteredSnippets.map((s) => s.id).join(',')}`,
+  )
+
   return (
     <>
     {editingSnippet ? (
@@ -244,7 +250,11 @@ function SnippetsPage({
           )}
           <ul className="item-list">
             {filteredSnippets.map((snippet) => (
-              <li key={snippet.id} className="item">
+              <li
+                key={snippet.id}
+                id={workspaceItemElementId(snippet.id)}
+                className="item"
+              >
                 <div>
                   <h3>{snippet.label}</h3>
                   <p>{snippet.content}</p>

@@ -1,6 +1,8 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import CreateFormDisclosure from '../components/CreateFormDisclosure.tsx'
+import { useScrollToItemHash } from '../hooks/useScrollToItemHash.ts'
+import { workspaceItemElementId } from '../workspaceItemIds.ts'
 import AddFolderModal from '../components/AddFolderModal.tsx'
 import FolderActionsMenu from '../components/FolderActionsMenu.tsx'
 import FolderPathBar from '../components/FolderPathBar.tsx'
@@ -184,6 +186,8 @@ function LoginsPage({
 
   const visibleFolders = pathValid ? getChildFolders(folders, activeFolderId) : []
 
+  useScrollToItemHash(`${pathRest}|${filteredLogins.map((l) => l.id).join(',')}`)
+
   return (
     <>
     {editingLogin ? (
@@ -295,7 +299,7 @@ function LoginsPage({
               const copyLabel = identifierType === 'email' ? 'Email' : 'Username'
 
               return (
-                <li key={login.id} className="item">
+                <li key={login.id} id={workspaceItemElementId(login.id)} className="item">
                   <div>
                     <h3>{login.site}</h3>
                     <p>
