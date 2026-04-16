@@ -96,6 +96,7 @@ function CreateSnippetForm({
 
 type SnippetsPageProps = {
   basePath: string
+  animateOnEntry: boolean
   snippets: CopySnippet[]
   folders: Folder[]
   onAddFolder: (name: string, parentId: string | null) => void
@@ -110,6 +111,7 @@ type SnippetsPageProps = {
 
 function SnippetsPage({
   basePath,
+  animateOnEntry,
   snippets,
   folders,
   onAddFolder,
@@ -186,7 +188,9 @@ function SnippetsPage({
         onSave={(name) => onAddFolder(name, activeFolder?.id ?? null)}
       />
     ) : null}
-    <section className="card fs-page">
+    <section
+      className={`card fs-page workspace-page workspace-page--snippets${animateOnEntry ? ' workspace-page--entry' : ''}`}
+    >
       <h2>Quick Copy Buttons</h2>
       <p>Save reusable snippets and copy them with one click.</p>
       <div className="fs-layout">

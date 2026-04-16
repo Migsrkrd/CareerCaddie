@@ -119,6 +119,7 @@ function CreateLoginForm({
 
 type LoginsPageProps = {
   basePath: string
+  animateOnEntry: boolean
   logins: LoginEntry[]
   folders: Folder[]
   hidePasswords: boolean
@@ -147,6 +148,7 @@ type LoginsPageProps = {
 
 function LoginsPage({
   basePath,
+  animateOnEntry,
   logins,
   folders,
   hidePasswords,
@@ -228,7 +230,9 @@ function LoginsPage({
         onSave={(name) => onAddFolder(name, activeFolder?.id ?? null)}
       />
     ) : null}
-    <section className="card fs-page">
+    <section
+      className={`card fs-page workspace-page workspace-page--logins${animateOnEntry ? ' workspace-page--entry' : ''}`}
+    >
       <h2>Saved Login Info</h2>
       <p>
         Keep website login details for your job hunt tools. Data stays only on your

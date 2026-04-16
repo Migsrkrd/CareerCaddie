@@ -114,6 +114,7 @@ function CreateLinkForm({
 
 type LinksPageProps = {
   basePath: string
+  animateOnEntry: boolean
   links: SavedLink[]
   folders: Folder[]
   onAddFolder: (name: string, parentId: string | null) => void
@@ -139,6 +140,7 @@ type LinksPageProps = {
 
 function LinksPage({
   basePath,
+  animateOnEntry,
   links,
   folders,
   onAddFolder,
@@ -215,7 +217,9 @@ function LinksPage({
         onSave={(name) => onAddFolder(name, activeFolder?.id ?? null)}
       />
     ) : null}
-    <section className="card fs-page">
+    <section
+      className={`card fs-page workspace-page workspace-page--links${animateOnEntry ? ' workspace-page--entry' : ''}`}
+    >
       <h2>Saved Job Links</h2>
       <p>Keep job postings, applications, and portal links in one place.</p>
       <div className="fs-layout">

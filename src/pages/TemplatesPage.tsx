@@ -25,6 +25,7 @@ import type { Folder, TemplateEntry } from '../types'
 
 type TemplatesPageProps = {
   basePath: string
+  animateOnEntry: boolean
   templates: TemplateEntry[]
   folders: Folder[]
   onAddFolder: (name: string, parentId: string | null) => void
@@ -40,6 +41,7 @@ type TemplatesPageProps = {
 
 function TemplatesPage({
   basePath,
+  animateOnEntry,
   templates,
   folders,
   onAddFolder,
@@ -148,7 +150,9 @@ function TemplatesPage({
         />
       ) : null}
 
-      <section className="card fs-page">
+      <section
+        className={`card fs-page workspace-page workspace-page--templates${animateOnEntry ? ' workspace-page--entry' : ''}`}
+      >
         <h2>Templates</h2>
         <p className="fs-page-subtitle">Create and manage reusable messages for applications. Use <code>[placeholders]</code>, fill the fields, then copy or download as PDF.</p>
 
