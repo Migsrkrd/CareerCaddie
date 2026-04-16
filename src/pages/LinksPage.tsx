@@ -1,7 +1,10 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import CreateFormDisclosure from '../components/CreateFormDisclosure.tsx'
+import { useAnimatedRemoval } from '../hooks/useAnimatedRemoval.ts'
+import { useRecentlyChangedIds } from '../hooks/useRecentlyChangedIds.ts'
 import { useScrollToItemHash } from '../hooks/useScrollToItemHash.ts'
+import { useRecentlyAddedIds } from '../hooks/useRecentlyAddedIds.ts'
 import { workspaceItemElementId } from '../workspaceItemIds.ts'
 import AddFolderModal from '../components/AddFolderModal.tsx'
 import FolderActionsMenu from '../components/FolderActionsMenu.tsx'
@@ -173,8 +176,26 @@ function LinksPage({
   })
 
   const visibleFolders = pathValid ? getChildFolders(folders, activeFolderId) : []
+  const enteringFolderIds = useRecentlyAddedIds(visibleFolders.map((folder) => folder.id))
+  const enteringLinkIds = useRecentlyAddedIds(filteredLinks.map((link) => link.id))
+  const { removingIds: removingLinkIds, removeWithAnimation: removeLinkWithAnimation } =
+    useAnimatedRemoval()
+  const { removingIds: removingFolderIds, removeWithAnimation: removeFolderWithAnimation } =
+    useAnimatedRemoval()
+  const changedFolderIds = useRecentlyChangedIds(
+    visibleFolders.map((folder) => ({ id: folder.id, signature: folder.name })),
+  )
+  const changedLinkIds = useRecentlyChangedIds(
+    filteredLinks.map((link) => ({
+      id: link.id,
+      signature: `${link.name}|${link.url}|${link.notes}|${link.iconUrl ?? ''}|${link.folderId ?? ''}`,
+    })),
+  )
 
   useScrollToItemHash(`${pathRest}|${filteredLinks.map((l) => l.id).join(',')}`)
+  const handleDeleteFolder = (id: string) => {
+    removeFolderWithAnimation(id, () => onDeleteFolder(id))
+  }
 
   return (
     <>
@@ -219,7 +240,8 @@ function LinksPage({
             rootLabel="Saved Links root"
             onOpenPath={(segments) => navigate(buildFolderUrl(basePath, segments))}
             onRenameFolder={onRenameFolder}
-            onDeleteFolder={onDeleteFolder}
+            onDeleteFolder={handleDeleteFolder}
+            removingFolderIds={removingFolderIds}
           />
         </aside>
 
@@ -257,7 +279,17 @@ function LinksPage({
           {pathValid && (
             <ul className="folder-list">
               {visibleFolders.map((folder) => (
-                <li key={folder.id} className="folder-browser-item">
+                <li
+                  key={folder.id}
+                  className={[
+                    'folder-browser-item',
+                    enteringFolderIds.has(folder.id) ? 'folder-browser-item--enter' : '',
+                    changedFolderIds.has(folder.id) ? 'folder-browser-item--flash' : '',
+                    removingFolderIds.has(folder.id) ? 'folder-browser-item--exit' : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                >
                   <button
                     type="button"
                     onClick={() =>
@@ -272,7 +304,7 @@ function LinksPage({
                     folderId={folder.id}
                     folderName={folder.name}
                     onRenameFolder={onRenameFolder}
-                    onDeleteFolder={onDeleteFolder}
+                    onDeleteFolder={handleDeleteFolder}
                   />
                 </li>
               ))}
@@ -280,7 +312,18 @@ function LinksPage({
           )}
           <ul className="item-list">
             {filteredLinks.map((link) => (
-              <li key={link.id} id={workspaceItemElementId(link.id)} className="item">
+              <li
+                key={link.id}
+                id={workspaceItemElementId(link.id)}
+                className={[
+                  'item',
+                  enteringLinkIds.has(link.id) ? 'item--enter' : '',
+                  changedLinkIds.has(link.id) ? 'item--flash' : '',
+                  removingLinkIds.has(link.id) ? 'item--exit' : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
+              >
                 <div>
                   <h3 className="item-title">
                     {link.iconUrl && !brokenIcons[link.id] ? (
@@ -342,7 +385,7 @@ function LinksPage({
                               type="button"
                               className="overflow-menu-btn overflow-menu-btn--danger"
                               onClick={() => {
-                                onDeleteLink(link.id)
+                                removeLinkWithAnimation(link.id, () => onDeleteLink(link.id))
                                 close()
                               }}
                             >

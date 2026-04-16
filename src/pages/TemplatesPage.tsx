@@ -1,7 +1,10 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import CreateFormDisclosure from '../components/CreateFormDisclosure.tsx'
+import { useAnimatedRemoval } from '../hooks/useAnimatedRemoval.ts'
+import { useRecentlyChangedIds } from '../hooks/useRecentlyChangedIds.ts'
 import { useScrollToItemHash } from '../hooks/useScrollToItemHash.ts'
+import { useRecentlyAddedIds } from '../hooks/useRecentlyAddedIds.ts'
 import { workspaceItemElementId } from '../workspaceItemIds.ts'
 import AddFolderModal from '../components/AddFolderModal.tsx'
 import CreateTemplateModal from '../components/CreateTemplateModal.tsx'
@@ -82,10 +85,32 @@ function TemplatesPage({
   })
 
   const visibleFolders = pathValid ? getChildFolders(folders, activeFolderId) : []
+  const enteringFolderIds = useRecentlyAddedIds(visibleFolders.map((folder) => folder.id))
+  const enteringTemplateIds = useRecentlyAddedIds(
+    filteredTemplates.map((template) => template.id),
+  )
+  const {
+    removingIds: removingTemplateIds,
+    removeWithAnimation: removeTemplateWithAnimation,
+  } = useAnimatedRemoval()
+  const { removingIds: removingFolderIds, removeWithAnimation: removeFolderWithAnimation } =
+    useAnimatedRemoval()
+  const changedFolderIds = useRecentlyChangedIds(
+    visibleFolders.map((folder) => ({ id: folder.id, signature: folder.name })),
+  )
+  const changedTemplateIds = useRecentlyChangedIds(
+    filteredTemplates.map((template) => ({
+      id: template.id,
+      signature: `${template.label}|${template.content}|${template.folderId ?? ''}`,
+    })),
+  )
 
   useScrollToItemHash(
     `${pathRest}|${filteredTemplates.map((t) => t.id).join(',')}`,
   )
+  const handleDeleteFolder = (id: string) => {
+    removeFolderWithAnimation(id, () => onDeleteFolder(id))
+  }
 
   return (
     <>
@@ -155,7 +180,8 @@ function TemplatesPage({
               rootLabel="Templates root"
               onOpenPath={(segments) => navigate(buildFolderUrl(basePath, segments))}
               onRenameFolder={onRenameFolder}
-              onDeleteFolder={onDeleteFolder}
+              onDeleteFolder={handleDeleteFolder}
+              removingFolderIds={removingFolderIds}
             />
           </aside>
 
@@ -192,7 +218,17 @@ function TemplatesPage({
             {pathValid && (
               <ul className="folder-list">
                 {visibleFolders.map((folder) => (
-                  <li key={folder.id} className="folder-browser-item">
+                  <li
+                    key={folder.id}
+                    className={[
+                      'folder-browser-item',
+                      enteringFolderIds.has(folder.id) ? 'folder-browser-item--enter' : '',
+                      changedFolderIds.has(folder.id) ? 'folder-browser-item--flash' : '',
+                      removingFolderIds.has(folder.id) ? 'folder-browser-item--exit' : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' ')}
+                  >
                     <button
                       type="button"
                       onClick={() =>
@@ -207,7 +243,7 @@ function TemplatesPage({
                     folderId={folder.id}
                     folderName={folder.name}
                     onRenameFolder={onRenameFolder}
-                    onDeleteFolder={onDeleteFolder}
+                    onDeleteFolder={handleDeleteFolder}
                   />
                   </li>
                 ))}
@@ -219,7 +255,14 @@ function TemplatesPage({
                 <li
                   key={template.id}
                   id={workspaceItemElementId(template.id)}
-                  className="item"
+                  className={[
+                    'item',
+                    enteringTemplateIds.has(template.id) ? 'item--enter' : '',
+                    changedTemplateIds.has(template.id) ? 'item--flash' : '',
+                    removingTemplateIds.has(template.id) ? 'item--exit' : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
                 >
                   <div>
                     <h3>{template.label}</h3>
@@ -260,7 +303,9 @@ function TemplatesPage({
                                 type="button"
                                 className="overflow-menu-btn overflow-menu-btn--danger"
                                 onClick={() => {
-                                  onDeleteTemplate(template.id)
+                                  removeTemplateWithAnimation(template.id, () =>
+                                    onDeleteTemplate(template.id),
+                                  )
                                   close()
                                 }}
                               >

@@ -254,6 +254,18 @@
   .global-search-results {
     transition: none;
   }
+
+  .folder-browser-item--enter,
+  .folder-tree-item--enter,
+  .folder-browser-item--exit,
+  .folder-tree-item--exit,
+  .item--enter,
+  .item--exit,
+  .folder-browser-item--flash::after,
+  .folder-tree-item--flash::after,
+  .item--flash::after {
+    animation: none;
+  }
 }
 
 .global-search-empty {
@@ -759,6 +771,18 @@
 
 .folder-tree-item {
   margin: 0;
+  position: relative;
+  border-radius: 8px;
+}
+
+.folder-tree-item--enter {
+  animation: folder-row-enter 320ms ease-out both;
+  will-change: transform, opacity;
+}
+
+.folder-tree-item--exit {
+  animation: folder-row-exit 220ms ease-in both;
+  pointer-events: none;
 }
 
 .folder-tree-row {
@@ -952,6 +976,18 @@
 
 .folder-browser-item {
   padding: 0.2rem 0.3rem;
+  position: relative;
+  border-radius: 8px;
+}
+
+.folder-browser-item--enter {
+  animation: folder-row-enter 320ms ease-out both;
+  will-change: transform, opacity;
+}
+
+.folder-browser-item--exit {
+  animation: folder-row-exit 220ms ease-in both;
+  pointer-events: none;
 }
 
 .folder-browser-item > button:first-child {
@@ -1056,6 +1092,108 @@
   background: #ffffff;
   /* Let the text column shrink and wrap so it never runs under the action buttons. */
   min-width: 0;
+  position: relative;
+}
+
+.item--enter {
+  animation: workspace-item-enter 360ms ease-out both;
+  will-change: transform, opacity;
+}
+
+.item--exit {
+  animation: workspace-item-exit 220ms ease-in both;
+  pointer-events: none;
+}
+
+@keyframes folder-row-enter {
+  from {
+    opacity: 0.01;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes folder-row-exit {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes workspace-item-enter {
+  from {
+    opacity: 0.01;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes workspace-item-exit {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+.folder-browser-item--flash::after,
+.folder-tree-item--flash::after,
+.item--flash::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    110deg,
+    rgba(191, 219, 254, 0) 32%,
+    rgba(147, 197, 253, 0.34) 48%,
+    rgba(191, 219, 254, 0) 64%
+  );
+  background-size: 230% 100%;
+  background-position: 120% 0;
+  pointer-events: none;
+}
+
+.folder-browser-item--flash::after,
+.folder-tree-item--flash::after {
+  animation: row-edit-flash 780ms ease-out;
+}
+
+.item--flash::after {
+  animation: row-edit-flash 860ms ease-out;
+}
+
+@keyframes row-edit-flash {
+  0% {
+    opacity: 0;
+    background-position: 120% 0;
+  }
+
+  18% {
+    opacity: 1;
+  }
+
+  100% {
+    background-position: -120% 0;
+    opacity: 0;
+  }
 }
 
 .item > :first-child {
