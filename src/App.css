@@ -284,8 +284,23 @@
   .settings-page--static-enter .settings-list > .setting-item,
   .settings-page--static-enter .settings-actions,
   .legal-page--static-enter .static-hero > *,
-  .legal-page--static-enter .legal-body > section {
-    animation: none;
+  .legal-page--static-enter .legal-body > section,
+  .create-disclosure-panel,
+  .create-disclosure-panel-inner {
+    transition: none;
+  }
+
+  .item-edit-backdrop,
+  .item-edit-backdrop.item-edit-backdrop--closing,
+  .item-edit-dialog,
+  .item-edit-dialog.item-edit-dialog--closing {
+    animation: none !important;
+  }
+
+  .item-edit-backdrop.item-edit-backdrop--closing,
+  .item-edit-dialog.item-edit-dialog--closing {
+    opacity: 0;
+    transition: opacity 0.12s ease;
   }
 }
 
@@ -459,6 +474,8 @@
   display: grid;
   grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
   gap: 0.95rem;
+  align-items: stretch;
+  min-height: clamp(26rem, 52vh, 44rem);
 }
 
 .workspace-page--entry {
@@ -504,7 +521,7 @@
   border-radius: 12px;
   padding: 0.8rem;
   background: #f8fafc;
-  min-height: 320px;
+  min-height: 0;
 }
 
 .fs-main-path {
@@ -691,14 +708,38 @@
   transform: rotate(0deg);
 }
 
-/* Inset tray when open: reads as one intentional block, not a second “stripe” */
+/* Slide: grid 0fr → 1fr. Outer overflow clips; closed state strips border/padding so no 1px sliver */
 .create-disclosure-panel {
-  margin: 0 0.55rem 0.65rem;
+  display: grid;
+  grid-template-rows: 0fr;
+  margin: 0 0.55rem;
+  overflow: hidden;
+  transition: grid-template-rows 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.create-disclosure--open .create-disclosure-panel {
+  grid-template-rows: 1fr;
+  margin-bottom: 0.65rem;
+}
+
+.create-disclosure-panel-inner {
+  overflow: hidden;
+  min-height: 0;
   padding: 0.85rem 0.9rem;
   border-radius: 10px;
   border: 1px solid #e2e8f0;
   background: #f8fafc;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  transition:
+    padding 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+    border-width 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.create-disclosure:not(.create-disclosure--open) .create-disclosure-panel-inner {
+  padding: 0;
+  border-width: 0;
+  box-shadow: none;
 }
 
 .entry-form.entry-form--disclosure {
@@ -1647,6 +1688,50 @@
   letter-spacing: -0.01em;
 }
 
+@keyframes modal-backdrop-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-backdrop-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes modal-dialog-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes modal-dialog-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+}
+
 .item-edit-backdrop {
   position: fixed;
   inset: 0;
@@ -1657,6 +1742,12 @@
   padding: 1rem;
   background: rgba(15, 23, 42, 0.45);
   backdrop-filter: blur(2px);
+  animation: modal-backdrop-in 0.24s ease-out both;
+}
+
+.item-edit-backdrop.item-edit-backdrop--closing {
+  animation: modal-backdrop-out 0.2s ease-in forwards;
+  pointer-events: none;
 }
 
 .item-edit-dialog {
@@ -1670,6 +1761,12 @@
   box-shadow:
     0 4px 6px -1px rgba(15, 23, 42, 0.08),
     0 20px 40px -12px rgba(15, 23, 42, 0.2);
+  transform-origin: center center;
+  animation: modal-dialog-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.item-edit-dialog.item-edit-dialog--closing {
+  animation: modal-dialog-out 0.2s ease-in forwards;
 }
 
 .folder-add-dialog {
@@ -3692,7 +3789,7 @@
     color: #cbd5e1;
   }
 
-  .create-disclosure-panel {
+  .create-disclosure-panel-inner {
     border-color: #334155;
     background: #0f172a;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
@@ -4548,6 +4645,7 @@
 
   .fs-layout {
     grid-template-columns: 1fr;
+    min-height: 0;
   }
 
   .fs-main {

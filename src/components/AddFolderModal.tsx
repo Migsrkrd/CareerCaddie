@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
+import { useAnimatedModalClose } from '../hooks/useAnimatedModalClose.ts'
 import { isValidFolderName } from '../folderUtils.ts'
 
 type AddFolderModalProps = {
@@ -10,16 +11,17 @@ type AddFolderModalProps = {
 function AddFolderModal({ parentLabel, onClose, onSave }: AddFolderModalProps) {
   const [name, setName] = useState('')
   const [error, setError] = useState('')
+  const { isClosing, requestClose } = useAnimatedModalClose(onClose)
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        onClose()
+        requestClose()
       }
     }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
-  }, [onClose])
+  }, [requestClose])
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -32,21 +34,21 @@ function AddFolderModal({ parentLabel, onClose, onSave }: AddFolderModalProps) {
       return
     }
     onSave(nextName)
-    onClose()
+    requestClose()
   }
 
   return (
     <div
-      className="item-edit-backdrop"
+      className={`item-edit-backdrop${isClosing ? ' item-edit-backdrop--closing' : ''}`}
       role="presentation"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) {
-          onClose()
+          requestClose()
         }
       }}
     >
       <div
-        className="item-edit-dialog folder-add-dialog"
+        className={`item-edit-dialog folder-add-dialog${isClosing ? ' item-edit-dialog--closing' : ''}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="add-folder-heading"
@@ -79,7 +81,7 @@ function AddFolderModal({ parentLabel, onClose, onSave }: AddFolderModalProps) {
             </p>
           ) : null}
           <div className="item-edit-actions">
-            <button type="button" className="item-edit-cancel" onClick={onClose}>
+            <button type="button" className="item-edit-cancel" onClick={requestClose}>
               Cancel
             </button>
             <button type="submit">Create folder</button>

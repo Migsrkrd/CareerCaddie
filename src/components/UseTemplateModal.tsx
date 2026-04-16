@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useAnimatedModalClose } from '../hooks/useAnimatedModalClose.ts'
 import type { TemplateEntry } from '../types'
 import {
   applyTemplateValues,
@@ -34,16 +35,17 @@ function UseTemplateModal({
     () => applyTemplateValues(template.content, values),
     [template.content, values],
   )
+  const { isClosing, requestClose } = useAnimatedModalClose(onClose)
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        onClose()
+        requestClose()
       }
     }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
-  }, [onClose])
+  }, [requestClose])
 
   const handleCopy = () => {
     onCopyFilled(preview, template.label)
@@ -69,16 +71,16 @@ function UseTemplateModal({
 
   return (
     <div
-      className="item-edit-backdrop"
+      className={`item-edit-backdrop${isClosing ? ' item-edit-backdrop--closing' : ''}`}
       role="presentation"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) {
-          onClose()
+          requestClose()
         }
       }}
     >
       <div
-        className="item-edit-dialog template-use-dialog"
+        className={`item-edit-dialog template-use-dialog${isClosing ? ' item-edit-dialog--closing' : ''}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="use-template-heading"
@@ -123,7 +125,7 @@ function UseTemplateModal({
         </div>
 
         <div className="template-action-bar">
-          <button type="button" className="btn btn--ghost" onClick={onClose}>
+          <button type="button" className="btn btn--ghost" onClick={requestClose}>
             Close
           </button>
           <div className="template-action-bar__cluster">

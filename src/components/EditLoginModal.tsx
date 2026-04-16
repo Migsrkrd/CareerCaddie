@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
+import { useAnimatedModalClose } from '../hooks/useAnimatedModalClose.ts'
 import type { LoginEntry } from '../types'
 
 type EditLoginModalProps = {
@@ -18,16 +19,17 @@ function EditLoginModal({ login, onClose, onSave }: EditLoginModalProps) {
   const [username, setUsername] = useState(() => login.username)
   const [password, setPassword] = useState(() => login.password)
   const [notes, setNotes] = useState(() => login.notes)
+  const { isClosing, requestClose } = useAnimatedModalClose(onClose)
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        onClose()
+        requestClose()
       }
     }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
-  }, [onClose])
+  }, [requestClose])
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -38,21 +40,21 @@ function EditLoginModal({ login, onClose, onSave }: EditLoginModalProps) {
       return
     }
     onSave(login.id, nextSite, nextUsername, password, nextNotes)
-    onClose()
+    requestClose()
   }
 
   return (
     <div
-      className="item-edit-backdrop"
+      className={`item-edit-backdrop${isClosing ? ' item-edit-backdrop--closing' : ''}`}
       role="presentation"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) {
-          onClose()
+          requestClose()
         }
       }}
     >
       <div
-        className="item-edit-dialog"
+        className={`item-edit-dialog${isClosing ? ' item-edit-dialog--closing' : ''}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="edit-login-heading"
@@ -91,7 +93,7 @@ function EditLoginModal({ login, onClose, onSave }: EditLoginModalProps) {
             onChange={(event) => setNotes(event.target.value)}
           />
           <div className="item-edit-actions">
-            <button type="button" className="item-edit-cancel" onClick={onClose}>
+            <button type="button" className="item-edit-cancel" onClick={requestClose}>
               Cancel
             </button>
             <button type="submit">Save</button>

@@ -21,7 +21,7 @@ function CreateFormDisclosure({
   const panelId = useId()
 
   return (
-    <div className="create-disclosure">
+    <div className={`create-disclosure${open ? ' create-disclosure--open' : ''}`}>
       <button
         type="button"
         id={triggerId}
@@ -51,10 +51,11 @@ function CreateFormDisclosure({
         id={panelId}
         role="region"
         aria-labelledby={triggerId}
-        hidden={!open}
+        aria-hidden={!open}
+        inert={!open ? true : undefined}
         className="create-disclosure-panel"
       >
-        {children}
+        <div className="create-disclosure-panel-inner">{children}</div>
       </div>
     </div>
   )
