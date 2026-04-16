@@ -264,7 +264,27 @@
   .workspace-page--entry,
   .folder-browser-item--flash::after,
   .folder-tree-item--flash::after,
-  .item--flash::after {
+  .item--flash::after,
+  .home-page--guide-enter .home-hero-header > *,
+  .home-page--guide-enter .home-hero-art,
+  .home-page--guide-enter .home-toc,
+  .home-page--guide-enter .home-sections > section,
+  .home-page--guide-enter .home-sections > .home-end-cta,
+  .about-page--static-enter .static-hero > *,
+  .about-page--static-enter .about-features > .about-feature,
+  .support-page--static-enter .support-contact-card .static-hero > *,
+  .support-page--static-enter .contact-form > *,
+  .support-page--static-enter .faq-card .static-hero > *,
+  .support-page--static-enter .faq-list > li,
+  .tools-page--static-enter .static-hero > *,
+  .tools-page--static-enter .tools-body > .tools-section,
+  .settings-page--static-enter > h2,
+  .settings-page--static-enter > p:first-of-type,
+  .settings-page--static-enter .storage-card,
+  .settings-page--static-enter .settings-list > .setting-item,
+  .settings-page--static-enter .settings-actions,
+  .legal-page--static-enter .static-hero > *,
+  .legal-page--static-enter .legal-body > section {
     animation: none;
   }
 }
@@ -2490,6 +2510,89 @@
   scroll-margin-top: 1.25rem;
 }
 
+@keyframes guide-wave-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.home-page--guide-enter .home-hero-header > * {
+  animation: guide-wave-reveal 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.home-page--guide-enter .home-hero-header > *:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.home-page--guide-enter .home-hero-header > *:nth-child(2) {
+  animation-delay: 52ms;
+}
+
+.home-page--guide-enter .home-hero-header > *:nth-child(3) {
+  animation-delay: 104ms;
+}
+
+.home-page--guide-enter .home-hero-art {
+  animation: guide-wave-reveal 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 140ms;
+}
+
+.home-page--guide-enter .home-toc {
+  animation: guide-wave-reveal 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 200ms;
+}
+
+.home-page--guide-enter .home-sections > section {
+  animation: guide-wave-reveal 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.home-page--guide-enter .home-sections > section:nth-child(1) {
+  animation-delay: 258ms;
+}
+
+.home-page--guide-enter .home-sections > section:nth-child(2) {
+  animation-delay: 312ms;
+}
+
+.home-page--guide-enter .home-sections > section:nth-child(3) {
+  animation-delay: 366ms;
+}
+
+.home-page--guide-enter .home-sections > section:nth-child(4) {
+  animation-delay: 420ms;
+}
+
+.home-page--guide-enter .home-sections > section:nth-child(5) {
+  animation-delay: 474ms;
+}
+
+.home-page--guide-enter .home-sections > section:nth-child(6) {
+  animation-delay: 528ms;
+}
+
+.home-page--guide-enter .home-sections > section:nth-child(7) {
+  animation-delay: 582ms;
+}
+
+.home-page--guide-enter .home-sections > section:nth-child(8) {
+  animation-delay: 636ms;
+}
+
+.home-page--guide-enter .home-sections > section:nth-child(9) {
+  animation-delay: 690ms;
+}
+
+.home-page--guide-enter .home-sections > .home-end-cta {
+  animation: guide-wave-reveal 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 752ms;
+}
+
 .home-section-heading {
   display: flex;
   align-items: flex-start;
@@ -2794,6 +2897,224 @@
   line-height: 1.6;
   color: #475569;
   max-width: 58ch;
+}
+
+/* About, Support, Tools, Settings — staggered load (reuses @keyframes guide-wave-reveal) */
+.about-page--static-enter .static-hero > *,
+.support-page--static-enter .support-contact-card .static-hero > *,
+.support-page--static-enter .faq-card .static-hero > *,
+.tools-page--static-enter .static-hero > * {
+  animation: guide-wave-reveal 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.about-page--static-enter .static-hero > *:nth-child(1),
+.support-page--static-enter .support-contact-card .static-hero > *:nth-child(1),
+.tools-page--static-enter .static-hero > *:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.about-page--static-enter .static-hero > *:nth-child(2),
+.support-page--static-enter .support-contact-card .static-hero > *:nth-child(2),
+.tools-page--static-enter .static-hero > *:nth-child(2) {
+  animation-delay: 52ms;
+}
+
+.about-page--static-enter .static-hero > *:nth-child(3),
+.support-page--static-enter .support-contact-card .static-hero > *:nth-child(3),
+.tools-page--static-enter .static-hero > *:nth-child(3) {
+  animation-delay: 104ms;
+}
+
+.support-page--static-enter .support-contact-card .static-hero > *:nth-child(4) {
+  animation-delay: 156ms;
+}
+
+.support-page--static-enter .faq-card .static-hero > *:nth-child(1) {
+  animation-delay: 372ms;
+}
+
+.support-page--static-enter .faq-card .static-hero > *:nth-child(2) {
+  animation-delay: 424ms;
+}
+
+.support-page--static-enter .faq-card .static-hero > *:nth-child(3) {
+  animation-delay: 476ms;
+}
+
+.about-page--static-enter .about-features > .about-feature {
+  animation: guide-wave-reveal 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.about-page--static-enter .about-features > .about-feature:nth-child(1) {
+  animation-delay: 168ms;
+}
+
+.about-page--static-enter .about-features > .about-feature:nth-child(2) {
+  animation-delay: 224ms;
+}
+
+.about-page--static-enter .about-features > .about-feature:nth-child(3) {
+  animation-delay: 280ms;
+}
+
+.about-page--static-enter .about-features > .about-feature:nth-child(4) {
+  animation-delay: 336ms;
+}
+
+.about-page--static-enter .about-features > .about-feature:nth-child(5) {
+  animation-delay: 392ms;
+}
+
+.about-page--static-enter .about-features > .about-feature:nth-child(6) {
+  animation-delay: 448ms;
+}
+
+.support-page--static-enter .contact-form > * {
+  animation: guide-wave-reveal 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.support-page--static-enter .contact-form > *:nth-child(1) {
+  animation-delay: 212ms;
+}
+
+.support-page--static-enter .contact-form > *:nth-child(2) {
+  animation-delay: 264ms;
+}
+
+.support-page--static-enter .contact-form > *:nth-child(3) {
+  animation-delay: 316ms;
+}
+
+.support-page--static-enter .faq-list > li {
+  animation: guide-wave-reveal 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.support-page--static-enter .faq-list > li:nth-child(1) {
+  animation-delay: 536ms;
+}
+
+.support-page--static-enter .faq-list > li:nth-child(2) {
+  animation-delay: 588ms;
+}
+
+.support-page--static-enter .faq-list > li:nth-child(3) {
+  animation-delay: 640ms;
+}
+
+.support-page--static-enter .faq-list > li:nth-child(4) {
+  animation-delay: 692ms;
+}
+
+.support-page--static-enter .faq-list > li:nth-child(5) {
+  animation-delay: 744ms;
+}
+
+.tools-page--static-enter .tools-body > .tools-section {
+  animation: guide-wave-reveal 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.tools-page--static-enter .tools-body > .tools-section:nth-child(1) {
+  animation-delay: 164ms;
+}
+
+.tools-page--static-enter .tools-body > .tools-section:nth-child(2) {
+  animation-delay: 228ms;
+}
+
+.tools-page--static-enter .tools-body > .tools-section:nth-child(3) {
+  animation-delay: 292ms;
+}
+
+.settings-page--static-enter > h2,
+.settings-page--static-enter > p:first-of-type,
+.settings-page--static-enter .storage-card,
+.settings-page--static-enter .settings-list > .setting-item,
+.settings-page--static-enter .settings-actions {
+  animation: guide-wave-reveal 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.settings-page--static-enter > h2 {
+  animation-delay: 0ms;
+}
+
+.settings-page--static-enter > p:first-of-type {
+  animation-delay: 52ms;
+}
+
+.settings-page--static-enter .storage-card {
+  animation-delay: 120ms;
+}
+
+.settings-page--static-enter .settings-list > .setting-item:nth-child(1) {
+  animation-delay: 196ms;
+}
+
+.settings-page--static-enter .settings-list > .setting-item:nth-child(2) {
+  animation-delay: 252ms;
+}
+
+.settings-page--static-enter .settings-list > .setting-item:nth-child(3) {
+  animation-delay: 308ms;
+}
+
+.settings-page--static-enter .settings-list > .setting-item:nth-child(4) {
+  animation-delay: 364ms;
+}
+
+.settings-page--static-enter .settings-actions {
+  animation-delay: 432ms;
+}
+
+.legal-page--static-enter .static-hero > * {
+  animation: guide-wave-reveal 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.legal-page--static-enter .static-hero > *:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.legal-page--static-enter .static-hero > *:nth-child(2) {
+  animation-delay: 52ms;
+}
+
+.legal-page--static-enter .static-hero > *:nth-child(3) {
+  animation-delay: 104ms;
+}
+
+.legal-page--static-enter .legal-body > section {
+  animation: guide-wave-reveal 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.legal-page--static-enter .legal-body > section:nth-child(1) {
+  animation-delay: 164ms;
+}
+
+.legal-page--static-enter .legal-body > section:nth-child(2) {
+  animation-delay: 220ms;
+}
+
+.legal-page--static-enter .legal-body > section:nth-child(3) {
+  animation-delay: 276ms;
+}
+
+.legal-page--static-enter .legal-body > section:nth-child(4) {
+  animation-delay: 332ms;
+}
+
+.legal-page--static-enter .legal-body > section:nth-child(5) {
+  animation-delay: 388ms;
+}
+
+.legal-page--static-enter .legal-body > section:nth-child(6) {
+  animation-delay: 444ms;
+}
+
+.legal-page--static-enter .legal-body > section:nth-child(7) {
+  animation-delay: 500ms;
+}
+
+.legal-page--static-enter .legal-body > section:nth-child(8) {
+  animation-delay: 556ms;
 }
 
 .support-contact-lead {

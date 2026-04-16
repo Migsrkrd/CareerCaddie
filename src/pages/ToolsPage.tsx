@@ -133,7 +133,7 @@ const toolGroups: ToolGroup[] = [
 
 function ToolsPage() {
   return (
-    <div className="card static-page tools-page">
+    <div className="card static-page tools-page tools-page--static-enter">
       <header className="static-hero static-hero--compact">
         <p className="static-eyebrow">Resources</p>
         <h2 className="static-title">Tools and sites</h2>

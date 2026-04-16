@@ -74,7 +74,7 @@ const features: Array<{ icon: string; title: string; body: ReactNode }> = [
 
 function AboutPage() {
   return (
-    <div className="about-page card static-page">
+    <div className="about-page about-page--static-enter card static-page">
       <header className="static-hero">
         <p className="static-eyebrow">About the app</p>
         <h2 className="static-title">Career Caddie</h2>

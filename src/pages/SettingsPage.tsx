@@ -87,7 +87,7 @@ function SettingsPage({
       : 0
 
   return (
-    <section className="card">
+    <section className="card settings-page settings-page--static-enter">
       <h2>Settings</h2>
       <p>Control privacy, link behavior, and local backup options.</p>
 

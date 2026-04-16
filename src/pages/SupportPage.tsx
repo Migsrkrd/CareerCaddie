@@ -102,7 +102,7 @@ function SupportPage() {
   }
 
   return (
-    <div className="support-page">
+    <div className="support-page support-page--static-enter">
       <div className="card static-page support-contact-card">
         <header className="static-hero static-hero--compact">
           <p className="static-eyebrow">Get in touch</p>
