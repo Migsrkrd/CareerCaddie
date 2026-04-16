@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 
 function TermsPage() {
   return (
-    <div className="card static-page legal-page">
+    <div className="card static-page legal-page legal-page--static-enter">
       <header className="static-hero static-hero--compact">
         <p className="static-eyebrow">Legal</p>
         <h2 className="static-title">Terms of use</h2>

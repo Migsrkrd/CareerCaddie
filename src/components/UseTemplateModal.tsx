@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
+import CopyFeedbackButton from './CopyFeedbackButton.tsx'
+import { useAnimatedModalClose } from '../hooks/useAnimatedModalClose.ts'
 import type { TemplateEntry } from '../types'
 import {
   applyTemplateValues,
@@ -10,7 +12,7 @@ import TemplatePlaceholderInput from './TemplatePlaceholderInput.tsx'
 type UseTemplateModalProps = {
   template: TemplateEntry
   onClose: () => void
-  onCopyFilled: (text: string, successLabel: string) => void
+  onCopyFilled: (text: string, successLabel: string) => Promise<boolean>
   onStatusMessage?: (message: string) => void
 }
 
@@ -34,20 +36,17 @@ function UseTemplateModal({
     () => applyTemplateValues(template.content, values),
     [template.content, values],
   )
+  const { isClosing, requestClose } = useAnimatedModalClose(onClose)
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        onClose()
+        requestClose()
       }
     }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
-  }, [onClose])
-
-  const handleCopy = () => {
-    onCopyFilled(preview, template.label)
-  }
+  }, [requestClose])
 
   const handleDownloadPdf = async () => {
     if (hasBracketPlaceholders(preview)) {
@@ -69,16 +68,16 @@ function UseTemplateModal({
 
   return (
     <div
-      className="item-edit-backdrop"
+      className={`item-edit-backdrop${isClosing ? ' item-edit-backdrop--closing' : ''}`}
       role="presentation"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) {
-          onClose()
+          requestClose()
         }
       }}
     >
       <div
-        className="item-edit-dialog template-use-dialog"
+        className={`item-edit-dialog template-use-dialog${isClosing ? ' item-edit-dialog--closing' : ''}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="use-template-heading"
@@ -123,16 +122,19 @@ function UseTemplateModal({
         </div>
 
         <div className="template-action-bar">
-          <button type="button" className="btn btn--ghost" onClick={onClose}>
+          <button type="button" className="btn btn--ghost" onClick={requestClose}>
             Close
           </button>
           <div className="template-action-bar__cluster">
             <button type="button" className="btn btn--secondary" onClick={handleDownloadPdf}>
               Download PDF
             </button>
-            <button type="button" className="btn btn--primary" onClick={handleCopy}>
+            <CopyFeedbackButton
+              className="btn btn--primary"
+              onCopy={() => onCopyFilled(preview, template.label)}
+            >
               Copy text
-            </button>
+            </CopyFeedbackButton>
           </div>
         </div>
       </div>

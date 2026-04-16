@@ -47,7 +47,7 @@ function HomePage() {
 
   return (
     <>
-      <div className="home-page card static-page" id="home-top">
+      <div className="home-page home-page--guide-enter card static-page" id="home-top">
         <div className="home-hero-banner">
           <div className="home-hero-copy">
             <header className="home-hero-header">

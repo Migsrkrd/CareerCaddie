@@ -1,6 +1,11 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import CreateFormDisclosure from '../components/CreateFormDisclosure.tsx'
+import { useAnimatedRemoval } from '../hooks/useAnimatedRemoval.ts'
+import { useRecentlyChangedIds } from '../hooks/useRecentlyChangedIds.ts'
+import { useScrollToItemHash } from '../hooks/useScrollToItemHash.ts'
+import { useRecentlyAddedIds } from '../hooks/useRecentlyAddedIds.ts'
+import { workspaceItemElementId } from '../workspaceItemIds.ts'
 import AddFolderModal from '../components/AddFolderModal.tsx'
 import CreateTemplateModal from '../components/CreateTemplateModal.tsx'
 import EditTemplateModal from '../components/EditTemplateModal.tsx'
@@ -20,6 +25,7 @@ import type { Folder, TemplateEntry } from '../types'
 
 type TemplatesPageProps = {
   basePath: string
+  animateOnEntry: boolean
   templates: TemplateEntry[]
   folders: Folder[]
   onAddFolder: (name: string, parentId: string | null) => void
@@ -29,12 +35,13 @@ type TemplatesPageProps = {
   onDeleteTemplate: (id: string) => void
   onMoveTemplate: (id: string, folderId: string | null) => void
   onUpdateTemplate: (id: string, label: string, content: string) => void
-  onCopyFilledTemplate: (text: string, successLabel: string) => void
+  onCopyFilledTemplate: (text: string, successLabel: string) => Promise<boolean>
   onTemplateStatusMessage?: (message: string) => void
 }
 
 function TemplatesPage({
   basePath,
+  animateOnEntry,
   templates,
   folders,
   onAddFolder,
@@ -80,6 +87,32 @@ function TemplatesPage({
   })
 
   const visibleFolders = pathValid ? getChildFolders(folders, activeFolderId) : []
+  const enteringFolderIds = useRecentlyAddedIds(visibleFolders.map((folder) => folder.id))
+  const enteringTemplateIds = useRecentlyAddedIds(
+    filteredTemplates.map((template) => template.id),
+  )
+  const {
+    removingIds: removingTemplateIds,
+    removeWithAnimation: removeTemplateWithAnimation,
+  } = useAnimatedRemoval()
+  const { removingIds: removingFolderIds, removeWithAnimation: removeFolderWithAnimation } =
+    useAnimatedRemoval()
+  const changedFolderIds = useRecentlyChangedIds(
+    visibleFolders.map((folder) => ({ id: folder.id, signature: folder.name })),
+  )
+  const changedTemplateIds = useRecentlyChangedIds(
+    filteredTemplates.map((template) => ({
+      id: template.id,
+      signature: `${template.label}|${template.content}|${template.folderId ?? ''}`,
+    })),
+  )
+
+  useScrollToItemHash(
+    `${pathRest}|${filteredTemplates.map((t) => t.id).join(',')}`,
+  )
+  const handleDeleteFolder = (id: string) => {
+    removeFolderWithAnimation(id, () => onDeleteFolder(id))
+  }
 
   return (
     <>
@@ -117,7 +150,9 @@ function TemplatesPage({
         />
       ) : null}
 
-      <section className="card fs-page">
+      <section
+        className={`card fs-page workspace-page workspace-page--templates${animateOnEntry ? ' workspace-page--entry' : ''}`}
+      >
         <h2>Templates</h2>
         <p className="fs-page-subtitle">Create and manage reusable messages for applications. Use <code>[placeholders]</code>, fill the fields, then copy or download as PDF.</p>
 
@@ -149,7 +184,8 @@ function TemplatesPage({
               rootLabel="Templates root"
               onOpenPath={(segments) => navigate(buildFolderUrl(basePath, segments))}
               onRenameFolder={onRenameFolder}
-              onDeleteFolder={onDeleteFolder}
+              onDeleteFolder={handleDeleteFolder}
+              removingFolderIds={removingFolderIds}
             />
           </aside>
 
@@ -183,10 +219,21 @@ function TemplatesPage({
                 </button>
               </div>
             </div>
+            <h3 className="section-title">Saved Templates</h3>
             {pathValid && (
               <ul className="folder-list">
                 {visibleFolders.map((folder) => (
-                  <li key={folder.id} className="folder-browser-item">
+                  <li
+                    key={folder.id}
+                    className={[
+                      'folder-browser-item',
+                      enteringFolderIds.has(folder.id) ? 'folder-browser-item--enter' : '',
+                      changedFolderIds.has(folder.id) ? 'folder-browser-item--flash' : '',
+                      removingFolderIds.has(folder.id) ? 'folder-browser-item--exit' : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' ')}
+                  >
                     <button
                       type="button"
                       onClick={() =>
@@ -201,16 +248,26 @@ function TemplatesPage({
                     folderId={folder.id}
                     folderName={folder.name}
                     onRenameFolder={onRenameFolder}
-                    onDeleteFolder={onDeleteFolder}
+                    onDeleteFolder={handleDeleteFolder}
                   />
                   </li>
                 ))}
               </ul>
             )}
-            <h3 className="section-title">Saved templates</h3>
             <ul className="item-list">
               {filteredTemplates.map((template) => (
-                <li key={template.id} className="item">
+                <li
+                  key={template.id}
+                  id={workspaceItemElementId(template.id)}
+                  className={[
+                    'item',
+                    enteringTemplateIds.has(template.id) ? 'item--enter' : '',
+                    changedTemplateIds.has(template.id) ? 'item--flash' : '',
+                    removingTemplateIds.has(template.id) ? 'item--exit' : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                >
                   <div>
                     <h3>{template.label}</h3>
                     <p className="template-list-preview">{template.content}</p>
@@ -250,7 +307,9 @@ function TemplatesPage({
                                 type="button"
                                 className="overflow-menu-btn overflow-menu-btn--danger"
                                 onClick={() => {
-                                  onDeleteTemplate(template.id)
+                                  removeTemplateWithAnimation(template.id, () =>
+                                    onDeleteTemplate(template.id),
+                                  )
                                   close()
                                 }}
                               >

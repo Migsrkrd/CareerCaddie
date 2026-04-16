@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import FolderActionsMenu from './FolderActionsMenu.tsx'
 import ItemOverflowMenu from './ItemOverflowMenu.tsx'
+import { useRecentlyAddedIds } from '../hooks/useRecentlyAddedIds.ts'
+import { useRecentlyChangedIds } from '../hooks/useRecentlyChangedIds.ts'
 import type { Folder } from '../types'
 
 export type FolderTreeItem = {
@@ -15,6 +17,7 @@ type FolderTreeProps = {
   items?: FolderTreeItem[]
   activeFolderId: string | null
   rootLabel: string
+  removingFolderIds?: Set<string>
   onOpenPath: (pathSegments: string[]) => void
   onRenameFolder: (id: string, nextName: string) => void
   onDeleteFolder: (id: string) => void
@@ -25,6 +28,7 @@ function FolderTree({
   items = [],
   activeFolderId,
   rootLabel,
+  removingFolderIds,
   onOpenPath,
   onRenameFolder,
   onDeleteFolder,
@@ -35,6 +39,14 @@ function FolderTree({
    * For the auto-open active branch path, users can still manually collapse nodes.
    */
   const [collapsedAutoIds, setCollapsedAutoIds] = useState<Set<string>>(() => new Set())
+  const enteringFolderIds = useRecentlyAddedIds(folders.map((folder) => folder.id))
+  const enteringItemIds = useRecentlyAddedIds(items.map((item) => item.id))
+  const changedFolderIds = useRecentlyChangedIds(
+    folders.map((folder) => ({ id: folder.id, signature: folder.name })),
+  )
+  const changedItemIds = useRecentlyChangedIds(
+    items.map((item) => ({ id: item.id, signature: item.label })),
+  )
   const parentById = new Map<string, string | null>()
 
   const childrenByParent = new Map<string, Folder[]>()
@@ -81,7 +93,18 @@ function FolderTree({
             ? !collapsedAutoIds.has(folder.id)
             : expandedIds.has(folder.id)
           return (
-            <li key={folder.id} className="folder-tree-item" role="treeitem">
+            <li
+              key={folder.id}
+              className={[
+                'folder-tree-item',
+                enteringFolderIds.has(folder.id) ? 'folder-tree-item--enter' : '',
+                changedFolderIds.has(folder.id) ? 'folder-tree-item--flash' : '',
+                removingFolderIds?.has(folder.id) ? 'folder-tree-item--exit' : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
+              role="treeitem"
+            >
               <div className="folder-tree-row" style={{ paddingLeft: `${depth * 0.7}rem` }}>
                 {hasChildren ? (
                   <button
@@ -138,7 +161,17 @@ function FolderTree({
           )
         })}
         {dataItems.map((item) => (
-          <li key={item.id} className="folder-tree-item" role="treeitem">
+          <li
+            key={item.id}
+            className={[
+              'folder-tree-item',
+              enteringItemIds.has(item.id) ? 'folder-tree-item--enter' : '',
+              changedItemIds.has(item.id) ? 'folder-tree-item--flash' : '',
+            ]
+              .filter(Boolean)
+              .join(' ')}
+            role="treeitem"
+          >
             <div className="folder-tree-row" style={{ paddingLeft: `${depth * 0.7}rem` }}>
               <span className="folder-tree-toggle-spacer" aria-hidden />
               <button

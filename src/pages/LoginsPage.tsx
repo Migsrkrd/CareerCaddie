@@ -1,6 +1,12 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import CreateFormDisclosure from '../components/CreateFormDisclosure.tsx'
+import { useAnimatedRemoval } from '../hooks/useAnimatedRemoval.ts'
+import { useRecentlyChangedIds } from '../hooks/useRecentlyChangedIds.ts'
+import { useScrollToItemHash } from '../hooks/useScrollToItemHash.ts'
+import { useRecentlyAddedIds } from '../hooks/useRecentlyAddedIds.ts'
+import { workspaceItemElementId } from '../workspaceItemIds.ts'
+import CopyFeedbackButton from '../components/CopyFeedbackButton.tsx'
 import AddFolderModal from '../components/AddFolderModal.tsx'
 import FolderActionsMenu from '../components/FolderActionsMenu.tsx'
 import FolderPathBar from '../components/FolderPathBar.tsx'
@@ -114,6 +120,7 @@ function CreateLoginForm({
 
 type LoginsPageProps = {
   basePath: string
+  animateOnEntry: boolean
   logins: LoginEntry[]
   folders: Folder[]
   hidePasswords: boolean
@@ -128,8 +135,8 @@ type LoginsPageProps = {
     folderId: string | null,
   ) => void
   onDeleteLogin: (id: string) => void
-  onCopyUsername: (login: LoginEntry) => void
-  onCopyPassword: (login: LoginEntry) => void
+  onCopyUsername: (login: LoginEntry) => Promise<boolean>
+  onCopyPassword: (login: LoginEntry) => Promise<boolean>
   onMoveLogin: (id: string, folderId: string | null) => void
   onUpdateLogin: (
     id: string,
@@ -142,6 +149,7 @@ type LoginsPageProps = {
 
 function LoginsPage({
   basePath,
+  animateOnEntry,
   logins,
   folders,
   hidePasswords,
@@ -183,6 +191,26 @@ function LoginsPage({
   })
 
   const visibleFolders = pathValid ? getChildFolders(folders, activeFolderId) : []
+  const enteringFolderIds = useRecentlyAddedIds(visibleFolders.map((folder) => folder.id))
+  const enteringLoginIds = useRecentlyAddedIds(filteredLogins.map((login) => login.id))
+  const { removingIds: removingLoginIds, removeWithAnimation: removeLoginWithAnimation } =
+    useAnimatedRemoval()
+  const { removingIds: removingFolderIds, removeWithAnimation: removeFolderWithAnimation } =
+    useAnimatedRemoval()
+  const changedFolderIds = useRecentlyChangedIds(
+    visibleFolders.map((folder) => ({ id: folder.id, signature: folder.name })),
+  )
+  const changedLoginIds = useRecentlyChangedIds(
+    filteredLogins.map((login) => ({
+      id: login.id,
+      signature: `${login.site}|${login.username}|${login.password}|${login.notes}|${login.folderId ?? ''}`,
+    })),
+  )
+
+  useScrollToItemHash(`${pathRest}|${filteredLogins.map((l) => l.id).join(',')}`)
+  const handleDeleteFolder = (id: string) => {
+    removeFolderWithAnimation(id, () => onDeleteFolder(id))
+  }
 
   return (
     <>
@@ -203,11 +231,12 @@ function LoginsPage({
         onSave={(name) => onAddFolder(name, activeFolder?.id ?? null)}
       />
     ) : null}
-    <section className="card fs-page">
+    <section
+      className={`card fs-page workspace-page workspace-page--logins${animateOnEntry ? ' workspace-page--entry' : ''}`}
+    >
       <h2>Saved Login Info</h2>
-      <p>
-        Keep website login details for your job hunt tools. Data stays only on your
-        device.
+      <p className="fs-page-subtitle">
+        Keep website login details for your job hunt tools. Data stays only on your device.
       </p>
       <div className="fs-layout">
         <aside className="fs-sidebar">
@@ -230,7 +259,8 @@ function LoginsPage({
             rootLabel="Login Vault root"
             onOpenPath={(segments) => navigate(buildFolderUrl(basePath, segments))}
             onRenameFolder={onRenameFolder}
-            onDeleteFolder={onDeleteFolder}
+            onDeleteFolder={handleDeleteFolder}
+            removingFolderIds={removingFolderIds}
           />
         </aside>
 
@@ -268,7 +298,17 @@ function LoginsPage({
           {pathValid && (
             <ul className="folder-list">
               {visibleFolders.map((folder) => (
-                <li key={folder.id} className="folder-browser-item">
+                <li
+                  key={folder.id}
+                  className={[
+                    'folder-browser-item',
+                    enteringFolderIds.has(folder.id) ? 'folder-browser-item--enter' : '',
+                    changedFolderIds.has(folder.id) ? 'folder-browser-item--flash' : '',
+                    removingFolderIds.has(folder.id) ? 'folder-browser-item--exit' : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                >
                   <button
                     type="button"
                     onClick={() =>
@@ -283,7 +323,7 @@ function LoginsPage({
                     folderId={folder.id}
                     folderName={folder.name}
                     onRenameFolder={onRenameFolder}
-                    onDeleteFolder={onDeleteFolder}
+                    onDeleteFolder={handleDeleteFolder}
                   />
                 </li>
               ))}
@@ -295,7 +335,18 @@ function LoginsPage({
               const copyLabel = identifierType === 'email' ? 'Email' : 'Username'
 
               return (
-                <li key={login.id} className="item">
+                <li
+                  key={login.id}
+                  id={workspaceItemElementId(login.id)}
+                  className={[
+                    'item',
+                    enteringLoginIds.has(login.id) ? 'item--enter' : '',
+                    changedLoginIds.has(login.id) ? 'item--flash' : '',
+                    removingLoginIds.has(login.id) ? 'item--exit' : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                >
                   <div>
                     <h3>{login.site}</h3>
                     <p>
@@ -312,12 +363,12 @@ function LoginsPage({
                     {login.notes && <p>{login.notes}</p>}
                   </div>
                   <div className="actions">
-                    <button type="button" onClick={() => onCopyUsername(login)}>
+                    <CopyFeedbackButton onCopy={() => onCopyUsername(login)}>
                       Copy {copyLabel}
-                    </button>
-                    <button type="button" onClick={() => onCopyPassword(login)}>
+                    </CopyFeedbackButton>
+                    <CopyFeedbackButton onCopy={() => onCopyPassword(login)}>
                       Copy Password
-                    </button>
+                    </CopyFeedbackButton>
                     <ItemOverflowMenu ariaLabel={`More actions for ${login.site}`}>
                       {(close) => (
                         <div className="overflow-menu-stack">
@@ -345,7 +396,9 @@ function LoginsPage({
                                 type="button"
                                 className="overflow-menu-btn overflow-menu-btn--danger"
                                 onClick={() => {
-                                  onDeleteLogin(login.id)
+                                  removeLoginWithAnimation(login.id, () =>
+                                    onDeleteLogin(login.id),
+                                  )
                                   close()
                                 }}
                               >

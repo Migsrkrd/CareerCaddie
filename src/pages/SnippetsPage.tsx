@@ -1,6 +1,12 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import CreateFormDisclosure from '../components/CreateFormDisclosure.tsx'
+import { useAnimatedRemoval } from '../hooks/useAnimatedRemoval.ts'
+import { useRecentlyChangedIds } from '../hooks/useRecentlyChangedIds.ts'
+import { useScrollToItemHash } from '../hooks/useScrollToItemHash.ts'
+import { useRecentlyAddedIds } from '../hooks/useRecentlyAddedIds.ts'
+import { workspaceItemElementId } from '../workspaceItemIds.ts'
+import CopyFeedbackButton from '../components/CopyFeedbackButton.tsx'
 import AddFolderModal from '../components/AddFolderModal.tsx'
 import FolderActionsMenu from '../components/FolderActionsMenu.tsx'
 import FolderPathBar from '../components/FolderPathBar.tsx'
@@ -91,6 +97,7 @@ function CreateSnippetForm({
 
 type SnippetsPageProps = {
   basePath: string
+  animateOnEntry: boolean
   snippets: CopySnippet[]
   folders: Folder[]
   onAddFolder: (name: string, parentId: string | null) => void
@@ -98,13 +105,14 @@ type SnippetsPageProps = {
   onDeleteFolder: (id: string) => void
   onAddSnippet: (label: string, content: string, folderId: string | null) => void
   onDeleteSnippet: (id: string) => void
-  onCopySnippet: (snippet: CopySnippet) => void
+  onCopySnippet: (snippet: CopySnippet) => Promise<boolean>
   onMoveSnippet: (id: string, folderId: string | null) => void
   onUpdateSnippet: (id: string, label: string, content: string) => void
 }
 
 function SnippetsPage({
   basePath,
+  animateOnEntry,
   snippets,
   folders,
   onAddFolder,
@@ -141,6 +149,28 @@ function SnippetsPage({
   })
 
   const visibleFolders = pathValid ? getChildFolders(folders, activeFolderId) : []
+  const enteringFolderIds = useRecentlyAddedIds(visibleFolders.map((folder) => folder.id))
+  const enteringSnippetIds = useRecentlyAddedIds(filteredSnippets.map((snippet) => snippet.id))
+  const { removingIds: removingSnippetIds, removeWithAnimation: removeSnippetWithAnimation } =
+    useAnimatedRemoval()
+  const { removingIds: removingFolderIds, removeWithAnimation: removeFolderWithAnimation } =
+    useAnimatedRemoval()
+  const changedFolderIds = useRecentlyChangedIds(
+    visibleFolders.map((folder) => ({ id: folder.id, signature: folder.name })),
+  )
+  const changedSnippetIds = useRecentlyChangedIds(
+    filteredSnippets.map((snippet) => ({
+      id: snippet.id,
+      signature: `${snippet.label}|${snippet.content}|${snippet.folderId ?? ''}`,
+    })),
+  )
+
+  useScrollToItemHash(
+    `${pathRest}|${filteredSnippets.map((s) => s.id).join(',')}`,
+  )
+  const handleDeleteFolder = (id: string) => {
+    removeFolderWithAnimation(id, () => onDeleteFolder(id))
+  }
 
   return (
     <>
@@ -159,9 +189,11 @@ function SnippetsPage({
         onSave={(name) => onAddFolder(name, activeFolder?.id ?? null)}
       />
     ) : null}
-    <section className="card fs-page">
+    <section
+      className={`card fs-page workspace-page workspace-page--snippets${animateOnEntry ? ' workspace-page--entry' : ''}`}
+    >
       <h2>Quick Copy Buttons</h2>
-      <p>Save reusable snippets and copy them with one click.</p>
+      <p className="fs-page-subtitle">Save reusable snippets and copy them with one click.</p>
       <div className="fs-layout">
         <aside className="fs-sidebar">
           <CreateSnippetForm
@@ -183,7 +215,8 @@ function SnippetsPage({
             rootLabel="Quick Copy root"
             onOpenPath={(segments) => navigate(buildFolderUrl(basePath, segments))}
             onRenameFolder={onRenameFolder}
-            onDeleteFolder={onDeleteFolder}
+            onDeleteFolder={handleDeleteFolder}
+            removingFolderIds={removingFolderIds}
           />
         </aside>
 
@@ -221,7 +254,17 @@ function SnippetsPage({
           {pathValid && (
             <ul className="folder-list">
               {visibleFolders.map((folder) => (
-                <li key={folder.id} className="folder-browser-item">
+                <li
+                  key={folder.id}
+                  className={[
+                    'folder-browser-item',
+                    enteringFolderIds.has(folder.id) ? 'folder-browser-item--enter' : '',
+                    changedFolderIds.has(folder.id) ? 'folder-browser-item--flash' : '',
+                    removingFolderIds.has(folder.id) ? 'folder-browser-item--exit' : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                >
                   <button
                     type="button"
                     onClick={() =>
@@ -236,7 +279,7 @@ function SnippetsPage({
                     folderId={folder.id}
                     folderName={folder.name}
                     onRenameFolder={onRenameFolder}
-                    onDeleteFolder={onDeleteFolder}
+                    onDeleteFolder={handleDeleteFolder}
                   />
                 </li>
               ))}
@@ -244,15 +287,26 @@ function SnippetsPage({
           )}
           <ul className="item-list">
             {filteredSnippets.map((snippet) => (
-              <li key={snippet.id} className="item">
+              <li
+                key={snippet.id}
+                id={workspaceItemElementId(snippet.id)}
+                className={[
+                  'item',
+                  enteringSnippetIds.has(snippet.id) ? 'item--enter' : '',
+                  changedSnippetIds.has(snippet.id) ? 'item--flash' : '',
+                  removingSnippetIds.has(snippet.id) ? 'item--exit' : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
+              >
                 <div>
                   <h3>{snippet.label}</h3>
                   <p>{snippet.content}</p>
                 </div>
                 <div className="actions">
-                  <button type="button" onClick={() => onCopySnippet(snippet)}>
+                  <CopyFeedbackButton onCopy={() => onCopySnippet(snippet)}>
                     Copy
-                  </button>
+                  </CopyFeedbackButton>
                   <ItemOverflowMenu ariaLabel={`More actions for ${snippet.label}`}>
                     {(close) => (
                       <div className="overflow-menu-stack">
@@ -280,7 +334,9 @@ function SnippetsPage({
                               type="button"
                               className="overflow-menu-btn overflow-menu-btn--danger"
                               onClick={() => {
-                                onDeleteSnippet(snippet.id)
+                                removeSnippetWithAnimation(snippet.id, () =>
+                                  onDeleteSnippet(snippet.id),
+                                )
                                 close()
                               }}
                             >

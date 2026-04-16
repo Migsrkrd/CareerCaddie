@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
-import { Navigate, NavLink, Route, Routes } from 'react-router-dom'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { Navigate, NavLink, Route, Routes, useLocation } from 'react-router-dom'
 import './App.css'
 import { getStoredValue, setStoredValue } from './indexedDb.ts'
 import AboutPage from './pages/AboutPage.tsx'
+import GlobalSearch from './components/GlobalSearch.tsx'
 import HomeLandingRoute from './components/HomeLandingRoute.tsx'
 import HomePage from './pages/HomePage.tsx'
 import LoginsPage from './pages/LoginsPage.tsx'
@@ -127,6 +128,7 @@ const getPayloadSizeInBytes = (payload: unknown): number =>
   getSizeInBytes(JSON.stringify(payload))
 
 function App() {
+  const location = useLocation()
   const [copyStatus, setCopyStatus] = useState<string>('')
   const [snippets, setSnippets] = useState<CopySnippet[]>([])
   const [snippetFolders, setSnippetFolders] = useState<Folder[]>([])
@@ -148,6 +150,12 @@ function App() {
     usage: number | null
     quota: number | null
   }>({ usage: null, quota: null })
+  const workspacePathRe = /^\/(snippets|links|logins|templates)(\/|$)/
+  const isWorkspacePath = (pathname: string) => workspacePathRe.test(pathname)
+  const previousPathnameRef = useRef(location.pathname)
+  const [workspaceEntryHold, setWorkspaceEntryHold] = useState(false)
+  const workspaceEntryHoldPathRef = useRef<string | null>(null)
+  const workspaceEntryHoldTimerRef = useRef<number | null>(null)
 
   useEffect(() => {
     let isMounted = true
@@ -365,15 +373,17 @@ function App() {
     settings,
   ])
 
-  const copyToClipboard = async (content: string, successLabel: string) => {
+  const copyToClipboard = async (content: string, successLabel: string): Promise<boolean> => {
     try {
       await navigator.clipboard.writeText(content)
       setCopyStatus(`${successLabel} copied!`)
       setTimeout(() => {
         setCopyStatus('')
       }, 1800)
+      return true
     } catch {
       setCopyStatus('Clipboard access failed. Please try again.')
+      return false
     }
   }
 
@@ -506,6 +516,51 @@ function App() {
   const workspaceTabClass = ({ isActive }: { isActive: boolean }) =>
     isActive ? 'app-workspace-tab active' : 'app-workspace-tab'
 
+  const path = location.pathname
+  const wasWorkspace = isWorkspacePath(previousPathnameRef.current)
+  const isWorkspace = isWorkspacePath(path)
+  const crossedIntoWorkspace = isWorkspace && !wasWorkspace
+  // Hold only applies to the route we first landed on; tab switches change `path` immediately so no cross-fade replay.
+  const animateWorkspaceEntry =
+    crossedIntoWorkspace ||
+    (workspaceEntryHold && workspaceEntryHoldPathRef.current === path)
+
+  useLayoutEffect(() => {
+    if (workspaceEntryHoldTimerRef.current !== null) {
+      window.clearTimeout(workspaceEntryHoldTimerRef.current)
+      workspaceEntryHoldTimerRef.current = null
+    }
+
+    if (!isWorkspace) {
+      setWorkspaceEntryHold(false)
+      workspaceEntryHoldPathRef.current = null
+    } else if (crossedIntoWorkspace) {
+      workspaceEntryHoldPathRef.current = path
+      setWorkspaceEntryHold(true)
+      workspaceEntryHoldTimerRef.current = window.setTimeout(() => {
+        setWorkspaceEntryHold(false)
+        workspaceEntryHoldPathRef.current = null
+        workspaceEntryHoldTimerRef.current = null
+      }, 480)
+    } else if (
+      workspaceEntryHoldPathRef.current !== null &&
+      path !== workspaceEntryHoldPathRef.current
+    ) {
+      setWorkspaceEntryHold(false)
+      workspaceEntryHoldPathRef.current = null
+    }
+
+    previousPathnameRef.current = path
+  }, [path, crossedIntoWorkspace, isWorkspace])
+
+  useEffect(() => {
+    return () => {
+      if (workspaceEntryHoldTimerRef.current !== null) {
+        window.clearTimeout(workspaceEntryHoldTimerRef.current)
+      }
+    }
+  }, [])
+
   const hasWorkspaceData =
     snippets.length > 0 ||
     links.length > 0 ||
@@ -551,20 +606,33 @@ function App() {
           copy, bookmarked links, and login details actually live. They stay on this device,
           not on someone else's servers.
         </p>
-        <nav className="app-workspace-nav" aria-label="Workspace">
-          <NavLink to="/snippets" className={workspaceTabClass}>
-            Quick Copy
-          </NavLink>
-          <NavLink to="/links" className={workspaceTabClass}>
-            Saved Links
-          </NavLink>
-          <NavLink to="/logins" className={workspaceTabClass}>
-            Login Vault
-          </NavLink>
-          <NavLink to="/templates" className={workspaceTabClass}>
-            Templates
-          </NavLink>
-        </nav>
+        <div className="app-workspace-nav-row">
+          <nav className="app-workspace-nav" aria-label="Workspace">
+            <NavLink to="/snippets" className={workspaceTabClass}>
+              Quick Copy
+            </NavLink>
+            <NavLink to="/links" className={workspaceTabClass}>
+              Saved Links
+            </NavLink>
+            <NavLink to="/logins" className={workspaceTabClass}>
+              Login Vault
+            </NavLink>
+            <NavLink to="/templates" className={workspaceTabClass}>
+              Templates
+            </NavLink>
+          </nav>
+          <GlobalSearch
+            isDataHydrated={isDataHydrated}
+            snippets={snippets}
+            snippetFolders={snippetFolders}
+            links={links}
+            linkFolders={linkFolders}
+            logins={logins}
+            loginFolders={loginFolders}
+            templates={templates}
+            templateFolders={templateFolders}
+          />
+        </div>
         <p className="status">{copyStatus || 'Clipboard actions ready.'}</p>
       </header>
 
@@ -585,6 +653,7 @@ function App() {
           element={
             <SnippetsPage
               basePath="/snippets"
+              animateOnEntry={animateWorkspaceEntry}
               snippets={snippets}
               folders={snippetFolders}
               onAddFolder={(name, parentId) =>
@@ -647,6 +716,7 @@ function App() {
           element={
             <LinksPage
               basePath="/links"
+              animateOnEntry={animateWorkspaceEntry}
               links={links}
               folders={linkFolders}
               onAddFolder={(name, parentId) =>
@@ -709,6 +779,7 @@ function App() {
           element={
             <LoginsPage
               basePath="/logins"
+              animateOnEntry={animateWorkspaceEntry}
               logins={logins}
               folders={loginFolders}
               hidePasswords={settings.hidePasswords}
@@ -814,6 +885,7 @@ function App() {
           element={
             <TemplatesPage
               basePath="/templates"
+              animateOnEntry={animateWorkspaceEntry}
               templates={templates}
               folders={templateFolders}
               onAddFolder={(name, parentId) =>

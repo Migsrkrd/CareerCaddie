@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
+import { useAnimatedModalClose } from '../hooks/useAnimatedModalClose.ts'
 import type { CopySnippet } from '../types'
 
 type EditSnippetModalProps = {
@@ -10,16 +11,17 @@ type EditSnippetModalProps = {
 function EditSnippetModal({ snippet, onClose, onSave }: EditSnippetModalProps) {
   const [label, setLabel] = useState(() => snippet.label)
   const [content, setContent] = useState(() => snippet.content)
+  const { isClosing, requestClose } = useAnimatedModalClose(onClose)
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        onClose()
+        requestClose()
       }
     }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
-  }, [onClose])
+  }, [requestClose])
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -29,21 +31,21 @@ function EditSnippetModal({ snippet, onClose, onSave }: EditSnippetModalProps) {
       return
     }
     onSave(snippet.id, nextLabel, nextContent)
-    onClose()
+    requestClose()
   }
 
   return (
     <div
-      className="item-edit-backdrop"
+      className={`item-edit-backdrop${isClosing ? ' item-edit-backdrop--closing' : ''}`}
       role="presentation"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) {
-          onClose()
+          requestClose()
         }
       }}
     >
       <div
-        className="item-edit-dialog"
+        className={`item-edit-dialog${isClosing ? ' item-edit-dialog--closing' : ''}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="edit-snippet-heading"
@@ -68,7 +70,7 @@ function EditSnippetModal({ snippet, onClose, onSave }: EditSnippetModalProps) {
             onChange={(event) => setContent(event.target.value)}
           />
           <div className="item-edit-actions">
-            <button type="button" className="item-edit-cancel" onClick={onClose}>
+            <button type="button" className="item-edit-cancel" onClick={requestClose}>
               Cancel
             </button>
             <button type="submit">Save</button>

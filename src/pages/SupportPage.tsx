@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import CopyFeedbackButton from '../components/CopyFeedbackButton.tsx'
 
 const SUPPORT_EMAIL = 'careercaddiesupport@gmail.com'
 
@@ -71,7 +72,7 @@ function SupportPage() {
     window.location.href = href
   }
 
-  const handleCopyMessage = async () => {
+  const handleCopyMessage = async (): Promise<boolean> => {
     const text = [
       `To: ${SUPPORT_EMAIL}`,
       subject && `Subject: ${subject}`,
@@ -86,8 +87,10 @@ function SupportPage() {
     try {
       await navigator.clipboard.writeText(text)
       setCopyStatus('Copied to clipboard.')
+      return true
     } catch {
       setCopyStatus('Could not copy. Select the text manually.')
+      return false
     }
   }
 
@@ -102,7 +105,7 @@ function SupportPage() {
   }
 
   return (
-    <div className="support-page">
+    <div className="support-page support-page--static-enter">
       <div className="card static-page support-contact-card">
         <header className="static-hero static-hero--compact">
           <p className="static-eyebrow">Get in touch</p>
@@ -133,13 +136,12 @@ function SupportPage() {
               >
                 Open in email app
               </button>
-              <button
-                type="button"
+              <CopyFeedbackButton
                 className="contact-action-btn contact-action-btn--secondary"
-                onClick={handleCopyMessage}
+                onCopy={handleCopyMessage}
               >
                 Copy message
-              </button>
+              </CopyFeedbackButton>
               <button
                 type="button"
                 className="contact-action-btn contact-action-btn--tertiary"

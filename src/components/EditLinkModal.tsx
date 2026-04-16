@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
+import { useAnimatedModalClose } from '../hooks/useAnimatedModalClose.ts'
 import { scrapeLinkFavicon, urlsEffectivelyEqual } from '../linkScrape'
 import type { SavedLink } from '../types'
 
@@ -22,16 +23,17 @@ function EditLinkModal({
   const [url, setUrl] = useState(() => link.url)
   const [notes, setNotes] = useState(() => link.notes)
   const [busy, setBusy] = useState(false)
+  const { isClosing, requestClose } = useAnimatedModalClose(onClose)
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        onClose()
+        requestClose()
       }
     }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
-  }, [onClose])
+  }, [requestClose])
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -58,21 +60,21 @@ function EditLinkModal({
       notes: nextNotes,
       iconUrl,
     })
-    onClose()
+    requestClose()
   }
 
   return (
     <div
-      className="item-edit-backdrop"
+      className={`item-edit-backdrop${isClosing ? ' item-edit-backdrop--closing' : ''}`}
       role="presentation"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) {
-          onClose()
+          requestClose()
         }
       }}
     >
       <div
-        className="item-edit-dialog"
+        className={`item-edit-dialog${isClosing ? ' item-edit-dialog--closing' : ''}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="edit-link-heading"
@@ -104,7 +106,7 @@ function EditLinkModal({
             onChange={(event) => setNotes(event.target.value)}
           />
           <div className="item-edit-actions">
-            <button type="button" className="item-edit-cancel" onClick={onClose} disabled={busy}>
+            <button type="button" className="item-edit-cancel" onClick={requestClose} disabled={busy}>
               Cancel
             </button>
             <button type="submit" disabled={busy}>
