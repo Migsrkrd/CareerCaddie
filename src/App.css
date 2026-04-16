@@ -1663,18 +1663,6 @@
   word-break: break-word;
 }
 
-.template-empty-state {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.7rem 1rem;
-  flex-wrap: wrap;
-}
-
-.template-empty-state .list-empty {
-  margin: 0;
-}
-
 .settings-list {
   display: grid;
   gap: 0.65rem;

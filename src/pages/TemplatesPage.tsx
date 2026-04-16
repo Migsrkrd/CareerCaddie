@@ -119,8 +119,7 @@ function TemplatesPage({
 
       <section className="card fs-page">
         <h2>Templates</h2>
-        <p className="fs-page-subtitle">Create and manage reusable messages for applications.</p>
-        <p>Use <code>[placeholders]</code>, fill the fields, then copy or download as PDF.</p>
+        <p className="fs-page-subtitle">Create and manage reusable messages for applications. Use <code>[placeholders]</code>, fill the fields, then copy or download as PDF.</p>
 
         <div className="fs-layout">
           <aside className="fs-sidebar">
@@ -184,7 +183,6 @@ function TemplatesPage({
                 </button>
               </div>
             </div>
-            <h3 className="section-title">Template folders</h3>
             {pathValid && (
               <ul className="folder-list">
                 {visibleFolders.map((folder) => (
@@ -271,16 +269,7 @@ function TemplatesPage({
               <p className="list-empty">This folder was not found.</p>
             )}
             {pathValid && !filteredTemplates.length && !visibleFolders.length && (
-              <div className="template-empty-state">
-                <p className="list-empty">No templates in this location.</p>
-                <button
-                  type="button"
-                  className="btn btn--primary btn--compact"
-                  onClick={openCreateTemplate}
-                >
-                  Create your first template
-                </button>
-              </div>
+              <p className="list-empty">No templates in this location.</p>
             )}
           </section>
         </div>
